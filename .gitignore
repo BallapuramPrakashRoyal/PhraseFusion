@@ -1,0 +1,65 @@
+# ==============================
+# PhraseFusion - Git Ignore
+# ==============================
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# ==============================
+# Frontend - Node / React / Vite
+# ==============================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# npm logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ==============================
+# Backend - Java / Maven
+# ==============================
+
+backend/target/
+backend/.mvn/timing.properties
+
+# Java compiled files
+*.class
+
+# ==============================
+# IDE
+# ==============================
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# ==============================
+# OS
+# ==============================
+
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Logs
+# ==============================
+
+*.log
+
+# ==============================
+# Temporary files
+# ==============================
+
+*.tmp
+*.temp
