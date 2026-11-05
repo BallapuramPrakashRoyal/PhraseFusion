@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -55,13 +55,25 @@ function Icon({ children, className = '' }) {
 
 function App() {
   const [language, setLanguage] = useState('german');
+  const [courseData, setCourseData] = useState(courses);
   const [selected, setSelected] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [showLesson, setShowLesson] = useState(false);
-  const course = courses[language];
+  const course = courseData[language];
   const isCorrect = selected === course.question.answer;
 
   const todayLabel = useMemo(() => new Intl.DateTimeFormat('en', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date()), []);
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) return;
+    fetch(`${apiUrl.replace(/\/$/, '')}/api/courses`)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('Course API unavailable')))
+      .then((remoteCourses) => setCourseData((current) => ({ ...current, ...remoteCourses })))
+      .catch(() => {
+        // Keep the bundled starter lessons usable when the API is not configured.
+      });
+  }, []);
 
   function chooseLanguage(next) {
     setLanguage(next);
@@ -71,7 +83,17 @@ function App() {
   }
 
   function submitAnswer() {
-    if (selected !== null) setSubmitted(true);
+    if (selected !== null) {
+      setSubmitted(true);
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (apiUrl) {
+        fetch(`${apiUrl.replace(/\/$/, '')}/api/progress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language, correct: selected === course.question.answer }),
+        }).catch(() => {});
+      }
+    }
   }
 
   return (
@@ -114,7 +136,7 @@ function App() {
           </section>
 
           <section className="hero-panel">
-            <div className="hero-copy"><div className="unit-kicker"><span className="unit-pill">UNIT 02</span><span>EVERYDAY CONVERSATIONS</span></div><h2>{language === 'german' ? 'Small words.<br /><em>Big confidence.</em>' : 'Find your voice.<br /><em>One phrase at a time.</em>'}</h2><p>Build a strong foundation with short, useful lessons inspired by your textbook path — then make every phrase your own.</p><button className="primary-button" onClick={() => setShowLesson(true)}>Continue lesson <span>→</span></button><div className="lesson-meta"><span>◷ 8 min</span><span>◉ +20 XP</span><span>◌ 4 exercises</span></div></div>
+            <div className="hero-copy"><div className="unit-kicker"><span className="unit-pill">UNIT 02</span><span>EVERYDAY CONVERSATIONS</span></div><h2>{language === 'german' ? <>Small words.<br /><em>Big confidence.</em></> : <>Find your voice.<br /><em>One phrase at a time.</em></>}</h2><p>Build a strong foundation with short, useful lessons inspired by your textbook path — then make every phrase your own.</p><button className="primary-button" onClick={() => setShowLesson(true)}>Continue lesson <span>→</span></button><div className="lesson-meta"><span>◷ 8 min</span><span>◉ +20 XP</span><span>◌ 4 exercises</span></div></div>
             <div className="hero-art"><div className="sun" /><div className="cloud cloud-one" /><div className="cloud cloud-two" /><div className="hill hill-back" /><div className="hill hill-front" /><div className="speech-bubble bubble-one">Hallo!</div><div className="speech-bubble bubble-two">Let's go ✦</div><div className="character"><div className="character-hair" /><div className="character-face"><span className="eye left" /><span className="eye right" /><span className="smile" /></div><div className="character-body" /><div className="book">A</div></div></div>
           </section>
 

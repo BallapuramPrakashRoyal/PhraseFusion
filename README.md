@@ -45,3 +45,18 @@ cd frontend
 npm install
 npm run dev
 ```
+
+### Deploying the connected app
+
+The frontend and Spring Boot API deploy separately:
+
+1. Deploy `backend` to Render, Railway, Fly.io, or another Docker host using
+   `backend/Dockerfile`. The API exposes `/api/health`, `/api/courses`, and
+   `/api/progress`.
+2. Set `FRONTEND_URL` on the backend to the deployed Vercel URL.
+3. Set `VITE_API_URL` in the Vercel project to the deployed backend URL, then
+   redeploy the frontend.
+
+Without `VITE_API_URL`, the frontend intentionally uses bundled starter lessons
+so the demo remains viewable, but course loading and progress submission are
+not connected to the backend.
