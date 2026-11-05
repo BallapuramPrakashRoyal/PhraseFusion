@@ -123,7 +123,7 @@ function App() {
   }
 
   function openLesson(exercises = null) {
-    const lesson = exercises || [{ ...course.chapters[1], type: 'choice' }];
+    const lesson = exercises || [{ ...course.chapters[0], type: 'choice' }];
     setActiveExercises(lesson); setExerciseIndex(0); setSelected(null); setSubmitted(false); setShowLesson(true);
   }
 
