@@ -223,15 +223,10 @@ function App() {
           {Object.entries(courseData).map(([key, item]) => <button key={key} className={`mini-course ${language === key ? 'selected' : ''}`} onClick={() => chooseLanguage(key)}><span className="course-flag">{item.flag}</span><span>{item.name}</span><span className="mini-arrow">›</span></button>)}
           <button className="add-course" onClick={() => setView('settings')}><span>＋</span> Add a language</button>
         </div>
-        <div className="sidebar-bottom">
-          <div className="streak-card"><div className="fire">♨</div><div><strong>7 day streak</strong><small>Keep the rhythm going!</small></div></div>
-          <button className={`nav-item settings ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')}><Icon>⚙</Icon> Settings</button>
-          <div className="profile"><div className="avatar">PR</div><div><strong>Prakash</strong><small>Explorer · {xp} XP</small></div><span className="more">•••</span></div>
-        </div>
       </aside>
 
       <main className="main">
-        <header className="topbar"><div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong><span className={`api-status ${apiStatus}`}>{apiStatus === 'connected' ? '● Live' : apiStatus === 'offline' ? '● Demo mode' : '○ Connecting'}</span></div><div className="top-actions"><button className="icon-button">?</button><button className="icon-button">⌕</button><button className="notification">♢<i /></button></div></header>
+        <header className="topbar"><div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong><span className={`api-status ${apiStatus}`}>{apiStatus === 'connected' ? '● Live' : apiStatus === 'offline' ? '● Demo mode' : '○ Connecting'}</span></div><div className="top-actions"><button className="icon-button">?</button><button className="icon-button">⌕</button><button className="notification">♢<i /></button><div className="top-streak"><span className="top-fire">🔥</span><div><strong>7</strong><small>day streak</small></div></div><button className={`top-settings ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')} aria-label="Open settings">⚙<span>Settings</span></button><button className="top-profile" onClick={() => setView('settings')} aria-label="Open profile"><span className="top-avatar">PR</span><span><strong>Prakash</strong><small>{xp} XP · Explorer</small></span><b>⌄</b></button></div></header>
         {view === 'learn' && <LearnView course={course} todayLabel={todayLabel} xp={xp} mastered={mastered} onStart={() => openLesson()} onChapter={(chapter) => openLesson([{ ...chapter, type: 'choice' }])} />}
         {view === 'practice' && <PracticeView course={course} onStart={openLesson} />}
         {view === 'review' && <ReviewView course={course} reviewed={reviewed} setReviewed={setReviewed} />}
