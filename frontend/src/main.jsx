@@ -178,9 +178,13 @@ function App() {
   function submitAnswer() {
     if (selected === null) return;
     setSubmitted(true);
-    if (isCorrect) { setXp((value) => value + 20); setMastered((value) => value + 1); }
+    recordPracticeResult(isCorrect);
+  }
+
+  function recordPracticeResult(correct) {
+    if (correct) { setXp((value) => value + 20); setMastered((value) => value + 1); }
     const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-    fetch(`${apiUrl}/api/progress`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language, correct: isCorrect }) }).catch(() => setApiStatus('offline'));
+    fetch(`${apiUrl}/api/progress`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language, correct }) }).catch(() => setApiStatus('offline'));
   }
 
   function nextExercise() {
@@ -220,7 +224,7 @@ function App() {
         {view === 'settings' && <SettingsView language={language} chooseLanguage={chooseLanguage} apiStatus={apiStatus} />}
       </main>
 
-      {showLesson && <LessonWorkspace chapter={activeLesson} course={{ ...course, exercises: lessonExercises }} exercise={exercise} exerciseIndex={exerciseIndex} selected={selected} submitted={submitted} isCorrect={isCorrect} setSelected={setSelected} submitAnswer={submitAnswer} nextExercise={nextExercise} close={() => { setShowLesson(false); setActiveExercises(null); setActiveLesson(null); }} />}
+      {showLesson && <LessonWorkspace chapter={activeLesson} course={{ ...course, exercises: lessonExercises }} exercise={exercise} exerciseIndex={exerciseIndex} selected={selected} submitted={submitted} isCorrect={isCorrect} setSelected={setSelected} submitAnswer={submitAnswer} recordPracticeResult={recordPracticeResult} nextExercise={nextExercise} close={() => { setShowLesson(false); setActiveExercises(null); setActiveLesson(null); }} />}
     </div>
   );
 }
@@ -250,12 +254,100 @@ function SettingsView({ language, chooseLanguage, apiStatus }) {
   return <div className="content inner-page"><p className="eyebrow">YOUR PREFERENCES</p><h1>Make PhraseFusion yours.</h1><p className="page-lead">Choose a comfortable pace. Effective learning is consistent, not exhausting.</p><div className="settings-list"><label><span>Learning language</span><select value={language} onChange={(event) => chooseLanguage(event.target.value)}><option value="german">German 🇩🇪</option><option value="english">English 🇬🇧</option></select></label><label><span>Daily goal</span><select defaultValue="5"><option value="5">5 minutes · Gentle</option><option value="10">10 minutes · Steady</option><option value="20">20 minutes · Focused</option></select></label><label><span>Backend connection</span><strong className={apiStatus}>{apiStatus === 'connected' ? 'Connected and syncing' : 'Using local demo data'}</strong></label><label><span>Learning approach</span><strong>Retrieval + spaced repetition</strong></label></div></div>;
 }
 
-function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, submitted, isCorrect, setSelected, submitAnswer, nextExercise, close }) {
+function buildPracticeSets(chapter, language) {
+  const first = chapter.teach[0] || (language === 'German' ? 'Hallo! — Hello!' : 'Hello! — Hallo!');
+  const [target, meaning] = first.split(' — ');
+  const isGerman = language === 'German';
+  const languageName = isGerman ? 'German' : 'English';
+  return {
+    writing: [
+      { prompt: `Write “${meaning || 'hello'}” in ${languageName}.`, target, accepted: [target.toLowerCase()] },
+      { prompt: `Write the ${languageName} word for “${meaning || 'hello'}”.`, target, accepted: [target.toLowerCase()] },
+    ],
+    listening: [
+      { prompt: 'Listen carefully. Which meaning did you hear?', phrase: target, choices: [meaning, 'Good night', 'Thank you', 'Where?'], answer: 0 },
+      { prompt: 'Listen and choose the phrase you heard.', phrase: target, choices: [target, chapter.teach[1]?.split(' — ')[0] || target, 'Gute Nacht!', 'Danke!'], answer: 0 },
+    ],
+    speaking: [
+      { prompt: `Say this ${languageName} phrase aloud, then check yourself:`, phrase: target, meaning },
+      { prompt: `Read this phrase naturally in ${languageName}:`, phrase: chapter.teach[1]?.split(' — ')[0] || target, meaning: chapter.teach[1]?.split(' — ')[1] || meaning },
+    ],
+    reading: [
+      { prompt: 'Read the mini-dialogue and choose the best meaning.', passage: `${target} — ${meaning}.`, choices: [meaning, 'See you tomorrow', 'I do not understand', 'What is your name?'], answer: 0 },
+      { prompt: 'Read the sentence and choose the matching translation.', passage: `A: ${target}\\nB: ${target}`, choices: [meaning, 'Good evening', 'Where do you live?', 'My name is Anna'], answer: 0 },
+    ],
+  };
+}
+
+function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, submitted, isCorrect, setSelected, submitAnswer, recordPracticeResult, nextExercise, close }) {
   const [tab, setTab] = useState('vocabulary');
+  const [practiceMode, setPracticeMode] = useState('writing');
+  const [practiceIndex, setPracticeIndex] = useState(0);
+  const [practiceAnswer, setPracticeAnswer] = useState('');
+  const [practiceSubmitted, setPracticeSubmitted] = useState(false);
+  const [practiceCorrect, setPracticeCorrect] = useState(false);
   const [vocabularyQuery, setVocabularyQuery] = useState('');
   const grammar = chapter.grammar || [{ title: 'Useful sentence pattern', rule: 'Notice the word order and repeat the example aloud.', examples: chapter.teach.slice(0, 2) }];
   const visibleVocabulary = chapter.teach.filter((phrase) => phrase.toLowerCase().includes(vocabularyQuery.toLowerCase()));
-  return <div className="lesson-screen"><header className="lesson-screen-header"><button className="back-button" onClick={close}>← Back to course</button><div><p className="eyebrow">NETZWERK A1 · CHAPTER LESSON</p><h2>{chapter.icon} {chapter.title}</h2></div><div className="lesson-score">+20 XP</div></header><div className="lesson-screen-body"><aside className="lesson-sidebar"><div className="lesson-sidebar-title">YOUR LESSON</div><button className={tab === 'vocabulary' ? 'lesson-tab active' : 'lesson-tab'} onClick={() => setTab('vocabulary')}><span>01</span><div><strong>Learn vocabulary</strong><small>{chapter.teach.length} essential phrases</small></div>✓</button><button className={tab === 'grammar' ? 'lesson-tab active' : 'lesson-tab'} onClick={() => setTab('grammar')}><span>02</span><div><strong>Learn grammar</strong><small>{grammar.length} simple patterns</small></div>✓</button><button className={tab === 'practice' ? 'lesson-tab active' : 'lesson-tab'} onClick={() => setTab('practice')}><span>03</span><div><strong>Practice</strong><small>Check what you remember</small></div>→</button><div className="lesson-reminder">💡 Learn first, retrieve second. That is how phrases become automatic.</div></aside><section className="lesson-stage">{tab === 'vocabulary' && <><p className="eyebrow">STAGE 1 · BUILD YOUR WORD BANK</p><h1>Learn the useful phrases.</h1><p className="stage-lead">Listen, read, and say each phrase before moving on.</p>  <div className="vocabulary-toolbar"><strong>{chapter.teach.length} glossary entries</strong><input value={vocabularyQuery} onChange={(event) => setVocabularyQuery(event.target.value)} placeholder="Search German or English..." aria-label="Search vocabulary" /></div><div className="phrase-grid">{visibleVocabulary.map((phrase) => { const [german, english] = phrase.split(' — '); return <article className="phrase-card" key={phrase}><div><strong>{german}</strong><span>{english}</span></div><button onClick={() => speakPhrase(german, course.name)}>🔊 Listen</button></article>; })}</div><div className="stage-tip">Say each phrase twice. The goal is not to memorize a list — it is to recognize and use the phrase in a real conversation.</div><button className="primary-button stage-button" onClick={() => setTab('grammar')}>I know these · Learn grammar <span>→</span></button></>}{tab === 'grammar' && <><p className="eyebrow">STAGE 2 · NOTICE THE PATTERN</p><h1>Grammar you can use today.</h1><p className="stage-lead">Small patterns unlock many new sentences. Read the rule, then say the examples aloud.</p><div className="grammar-grid">{grammar.map((item) => <article className="grammar-card" key={item.title}><span className="grammar-label">PATTERN</span><h3>{item.title}</h3><p>{item.rule}</p>{item.examples.map((example) => <div className="grammar-example" key={example}><span>{example}</span><button onClick={() => speakPhrase(example.split(' — ')[0], course.name)}>🔊</button></div>)}</article>)}</div><div className="stage-tip">If you can explain the pattern in your own words, you are ready to practise it.</div><button className="primary-button stage-button" onClick={() => setTab('practice')}>I understand · Start practice <span>→</span></button></>}{tab === 'practice' && <><p className="eyebrow">STAGE 3 · RETRIEVE FROM MEMORY</p><h1>Show what you remember.</h1><p className="stage-lead">Choose an answer without looking back. Mistakes help your brain learn.</p><div className="practice-box"><div className="exercise-mascot">🤔</div><p className="eyebrow">PRACTICE QUESTION</p><h2>{exercise.prompt}</h2><div className="choices">{exercise.choices.map((choice, index) => <button key={choice} className={`choice ${selected === index ? 'chosen' : ''} ${submitted && index === exercise.answer ? 'correct' : ''} ${submitted && selected === index && !isCorrect ? 'incorrect' : ''}`} onClick={() => !submitted && setSelected(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}{submitted && index === exercise.answer && <span className="choice-status">✓</span>}</button>)}</div>{submitted && <div className={`feedback ${isCorrect ? 'feedback-good' : 'feedback-try'}`}><strong>{isCorrect ? 'Brilliant! That’s the one. ✨' : 'Good try — let’s make it stick.'}</strong><span>{isCorrect ? exercise.translation : exercise.hint}</span></div>}{!submitted ? <button className="primary-button stage-button" disabled={selected === null} onClick={submitAnswer}>Check answer <span>→</span></button> : <button className="primary-button stage-button" onClick={nextExercise}>{exerciseIndex === course.exercises.length - 1 ? 'Finish lesson' : 'Next exercise'} <span>→</span></button>}</div></>}</section></div></div>;
+  const practiceSets = buildPracticeSets(chapter, course.name);
+  const practiceQuestions = practiceSets[practiceMode];
+  const practiceQuestion = practiceQuestions[practiceIndex];
+
+  function choosePracticeMode(mode) {
+    setPracticeMode(mode);
+    setPracticeIndex(0);
+    setPracticeAnswer('');
+    setPracticeSubmitted(false);
+    setPracticeCorrect(false);
+  }
+
+  function checkWriting() {
+    const correct = practiceQuestion.accepted.includes(practiceAnswer.trim().toLowerCase());
+    setPracticeCorrect(correct);
+    setPracticeSubmitted(true);
+    recordPracticeResult(correct);
+  }
+
+  function checkPracticeChoice(index) {
+    if (practiceSubmitted) return;
+    const correct = index === practiceQuestion.answer;
+    setPracticeAnswer(String(index));
+    setPracticeCorrect(correct);
+    setPracticeSubmitted(true);
+    recordPracticeResult(correct);
+  }
+
+  function completeSpeaking() {
+    setPracticeCorrect(true);
+    setPracticeSubmitted(true);
+    recordPracticeResult(true);
+  }
+
+  function nextSkillQuestion() {
+    if (practiceIndex === practiceQuestions.length - 1) {
+      setPracticeIndex(0);
+    } else {
+      setPracticeIndex((value) => value + 1);
+    }
+    setPracticeAnswer('');
+    setPracticeSubmitted(false);
+    setPracticeCorrect(false);
+  }
+
+  const renderSkillQuestion = () => {
+    if (practiceMode === 'writing') {
+      return <><h2>{practiceQuestion.prompt}</h2><input className="practice-input" value={practiceAnswer} onChange={(event) => setPracticeAnswer(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && !practiceSubmitted && checkWriting()} placeholder="Type your answer..." disabled={practiceSubmitted} autoComplete="off" />{practiceSubmitted && <p className="answer-reveal">Correct answer: <strong>{practiceQuestion.target}</strong></p>}</>;
+    }
+    if (practiceMode === 'listening') {
+      return <><h2>{practiceQuestion.prompt}</h2><button className="listen-prompt" onClick={() => speakPhrase(practiceQuestion.phrase, course.name)}>🔊 Play audio again</button><div className="choices">{practiceQuestion.choices.map((choice, index) => <button key={choice} className={`choice ${practiceAnswer === String(index) ? 'chosen' : ''} ${practiceSubmitted && index === practiceQuestion.answer ? 'correct' : ''} ${practiceSubmitted && practiceAnswer === String(index) && !practiceCorrect ? 'incorrect' : ''}`} onClick={() => checkPracticeChoice(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}</button>)}</div></>;
+    }
+    if (practiceMode === 'speaking') {
+      return <><h2>{practiceQuestion.prompt}</h2><div className="speak-target"><strong>{practiceQuestion.phrase}</strong><span>{practiceQuestion.meaning}</span></div><div className="speaking-actions"><button className="listen-prompt" onClick={() => speakPhrase(practiceQuestion.phrase, course.name)}>🔊 Hear model</button><button className="secondary-button" onClick={completeSpeaking} disabled={practiceSubmitted}>🎙 I said it clearly</button></div><p className="practice-note">There is no pressure to be perfect. Compare your pronunciation with the model and try again.</p></>;
+    }
+    return <><h2>{practiceQuestion.prompt}</h2><div className="reading-passage">{practiceQuestion.passage.split('\\n').map((line) => <p key={line}>{line}</p>)}</div><div className="choices">{practiceQuestion.choices.map((choice, index) => <button key={choice} className={`choice ${practiceAnswer === String(index) ? 'chosen' : ''} ${practiceSubmitted && index === practiceQuestion.answer ? 'correct' : ''} ${practiceSubmitted && practiceAnswer === String(index) && !practiceCorrect ? 'incorrect' : ''}`} onClick={() => checkPracticeChoice(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}</button>)}</div></>;
+  };
+
+  return <div className="lesson-screen"><header className="lesson-screen-header"><button className="back-button" onClick={close}>← Back to course</button><div><p className="eyebrow">NETZWERK A1 · CHAPTER LESSON</p><h2>{chapter.icon} {chapter.title}</h2></div><div className="lesson-score">+20 XP</div></header><div className="lesson-screen-body"><aside className="lesson-sidebar"><div className="lesson-sidebar-title">YOUR LESSON</div><button className={tab === 'vocabulary' ? 'lesson-tab active' : 'lesson-tab'} onClick={() => setTab('vocabulary')}><span>01</span><div><strong>Learn vocabulary</strong><small>{chapter.teach.length} essential phrases</small></div>✓</button><button className={tab === 'grammar' ? 'lesson-tab active' : 'lesson-tab'} onClick={() => setTab('grammar')}><span>02</span><div><strong>Learn grammar</strong><small>{grammar.length} simple patterns</small></div>✓</button><button className={tab === 'practice' ? 'lesson-tab active' : 'lesson-tab'} onClick={() => setTab('practice')}><span>03</span><div><strong>Practice</strong><small>Four skill workouts</small></div>→</button><div className="lesson-reminder">💡 Learn first, retrieve second. That is how phrases become automatic.</div></aside><section className="lesson-stage">{tab === 'vocabulary' && <><p className="eyebrow">STAGE 1 · BUILD YOUR WORD BANK</p><h1>Learn the useful phrases.</h1><p className="stage-lead">Listen, read, and say each phrase before moving on.</p><div className="vocabulary-toolbar"><strong>{chapter.teach.length} glossary entries</strong><input value={vocabularyQuery} onChange={(event) => setVocabularyQuery(event.target.value)} placeholder="Search German or English..." aria-label="Search vocabulary" /></div><div className="phrase-grid">{visibleVocabulary.map((phrase) => { const [german, english] = phrase.split(' — '); return <article className="phrase-card" key={phrase}><div><strong>{german}</strong><span>{english}</span></div><button onClick={() => speakPhrase(german, course.name)}>🔊 Listen</button></article>; })}</div><div className="stage-tip">Say each phrase twice. The goal is not to memorize a list — it is to recognize and use the phrase in a real conversation.</div><button className="primary-button stage-button" onClick={() => setTab('grammar')}>I know these · Learn grammar <span>→</span></button></>}{tab === 'grammar' && <><p className="eyebrow">STAGE 2 · NOTICE THE PATTERN</p><h1>Grammar you can use today.</h1><p className="stage-lead">Small patterns unlock many new sentences. Read the rule, then say the examples aloud.</p><div className="grammar-grid">{grammar.map((item) => <article className="grammar-card" key={item.title}><span className="grammar-label">PATTERN</span><h3>{item.title}</h3><p>{item.rule}</p>{item.examples.map((example) => <div className="grammar-example" key={example}><span>{example}</span><button onClick={() => speakPhrase(example.split(' — ')[0], course.name)}>🔊</button></div>)}</article>)}</div><div className="stage-tip">If you can explain the pattern in your own words, you are ready to practise it.</div><button className="primary-button stage-button" onClick={() => setTab('practice')}>I understand · Start practice <span>→</span></button></>}{tab === 'practice' && <><p className="eyebrow">STAGE 3 · RETRIEVE FROM MEMORY</p><h1>Practice every skill.</h1><p className="stage-lead">Train writing, listening, speaking, and reading so you can use the language in real life.</p><div className="practice-modes">{[['writing', '✍️', 'Writing'], ['listening', '🎧', 'Listening'], ['speaking', '🗣️', 'Speaking'], ['reading', '📖', 'Reading']].map(([mode, icon, label]) => <button key={mode} className={practiceMode === mode ? 'practice-mode active' : 'practice-mode'} onClick={() => choosePracticeMode(mode)}><span>{icon}</span>{label}</button>)}</div><div className="practice-box"><div className="exercise-mascot">{practiceMode === 'writing' ? '✍️' : practiceMode === 'listening' ? '🎧' : practiceMode === 'speaking' ? '🗣️' : '📖'}</div><p className="eyebrow">{practiceMode.toUpperCase()} PRACTICE · {practiceIndex + 1}/{practiceQuestions.length}</p>{renderSkillQuestion()}{practiceSubmitted && <div className={`feedback ${practiceCorrect ? 'feedback-good' : 'feedback-try'}`}><strong>{practiceCorrect ? 'Nice work! Keep going. ✨' : 'Good try — use the correction and try again.'}</strong><span>{practiceCorrect ? 'Your answer matched the target.' : `The answer is ${practiceMode === 'writing' ? practiceQuestion.target : practiceQuestion.choices?.[practiceQuestion.answer] || practiceQuestion.phrase}.`}</span></div>}{!practiceSubmitted && practiceMode === 'writing' && <button className="primary-button stage-button" disabled={!practiceAnswer.trim()} onClick={checkWriting}>Check writing <span>→</span></button>}{practiceSubmitted && <button className="primary-button stage-button" onClick={nextSkillQuestion}>{practiceIndex === practiceQuestions.length - 1 ? 'Practise again' : 'Next question'} <span>→</span></button>}</div><div className="practice-box classic-practice"><p className="eyebrow">MIXED RECALL</p><h2>{exercise.prompt}</h2><div className="choices">{exercise.choices.map((choice, index) => <button key={choice} className={`choice ${selected === index ? 'chosen' : ''} ${submitted && index === exercise.answer ? 'correct' : ''} ${submitted && selected === index && !isCorrect ? 'incorrect' : ''}`} onClick={() => !submitted && setSelected(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}{submitted && index === exercise.answer && <span className="choice-status">✓</span>}</button>)}</div>{submitted && <div className={`feedback ${isCorrect ? 'feedback-good' : 'feedback-try'}`}><strong>{isCorrect ? 'Brilliant! That’s the one. ✨' : 'Good try — let’s make it stick.'}</strong><span>{isCorrect ? exercise.translation : exercise.hint}</span></div>}{!submitted ? <button className="primary-button stage-button" disabled={selected === null} onClick={submitAnswer}>Check mixed recall <span>→</span></button> : <button className="primary-button stage-button" onClick={nextExercise}>{exerciseIndex === course.exercises.length - 1 ? 'Finish lesson' : 'Next mixed question'} <span>→</span></button>}</div></>}</section></div></div>;
 }
 
 createRoot(document.getElementById('root')).render(<App />);
