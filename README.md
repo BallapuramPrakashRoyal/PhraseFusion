@@ -1,274 +1,259 @@
 # PhraseFusion
 
-> **Learn a language. Build a habit. Find your voice.**
+<div align="center">
 
-PhraseFusion is a playful, textbook-aligned language-learning web application for effective beginner practice. It combines a colorful gamified interface with a structured learning loop:
+### Learn languages through movement, memory, and real practice.
 
-**Learn vocabulary → understand grammar → practise four skills → review again.**
+An interactive language-learning platform designed to make German and English practice feel visual, motivating, and effective.
 
-The first learning paths focus on **German A1** and **English A1**, with the German curriculum shaped around the supplied **Netzwerk A1 glossary**. PhraseFusion uses original explanations, examples, and exercises rather than reproducing publisher pages.
+<p>
+  <a href="https://phrase-fusion.vercel.app">Live Application</a> ·
+  <a href="https://github.com/BallapuramPrakashRoyal/PhraseFusion">Source Code</a>
+</p>
 
-## What makes PhraseFusion different?
+![React](https://img.shields.io/badge/React-2026-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-Frontend-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-Backend-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Deployment](https://img.shields.io/badge/Deployment-Vercel_%2B_Render-black?style=for-the-badge)
 
-PhraseFusion is designed to make practice active instead of passive:
+</div>
 
-- Short lessons built around useful words and real phrases
-- Grammar explained in small, usable patterns
-- Retrieval practice instead of only reading flashcards
-- Writing, listening, speaking, and reading activities in every lesson
-- German-aware pronunciation with `de-DE` speech synthesis
-- Browser microphone validation for speaking practice
-- Visual emoji cues that make vocabulary easier to recognize
-- XP, streaks, progress, stars, locked units, and celebratory interactions
-- Responsive layouts for desktop, tablet, and mobile
+---
 
-## Current interface
+## Overview
+
+PhraseFusion is a gamified language-learning web application for learners who want more than passive flashcards. It combines a playful visual interface with a structured learning method:
+
+> **Learn vocabulary → understand grammar → practise every skill → review and repeat**
+
+The application currently focuses on:
+
+- **German A1**, with lessons shaped around the Netzwerk A1 glossary
+- **English A1**, with beginner-friendly vocabulary and grammar practice
+
+PhraseFusion uses original explanations, examples, and exercises inspired by textbook topics. It does not reproduce publisher pages.
+
+## Why PhraseFusion?
+
+Most language apps optimize for quick taps. PhraseFusion is designed around deeper recall and practical use:
+
+- Learn words in meaningful phrases
+- See grammar patterns in context
+- Write what you remember
+- Listen to native-language pronunciation
+- Speak into the microphone and receive transcript-based validation
+- Read short passages and check comprehension
+- Review difficult items instead of repeating everything equally
+
+## Product experience
 
 ### Playful learning dashboard
 
-- German-inspired cream, black, red, and gold visual system
+The dashboard creates a motivating starting point for every study session:
+
 - Animated 3D vocabulary cube
 - Floating phrase bubbles and sparkles
-- Animated course path with unit banners, lesson nodes, locks, and stars
-- Horizontal top-right controls for streak, settings, profile, and XP
-- Live backend or Demo mode status indicator
+- German-inspired cream, black, red, and gold visual system
+- XP, daily streak, progress, stars, and unit completion
+- Animated course path with lesson nodes and locked units
+- Responsive layout for desktop, tablet, and mobile
 
-### Structured lesson workspace
+### Structured lessons
 
-Each lesson is divided into three clear stages:
+Every lesson follows a clear three-stage learning journey:
 
-1. **Learn vocabulary**
-   - Full searchable glossary list
-   - Emoji or visual representation for each word
-   - English meaning
-   - Native-language pronunciation button
+#### 01. Learn vocabulary
 
-2. **Learn grammar**
-   - Clear grammar rules
-   - Example sentences
-   - Pronunciation for each example
-   - Beginner-friendly explanations
+- Searchable glossary entries
+- German phrase and English meaning
+- Contextual emoji visual for every vocabulary item
+- Pronunciation button for each phrase
+- Full vocabulary banks instead of only a few sample words
 
-3. **Practise**
-   - Writing questions
-   - Listening questions with audio playback
-   - Speaking questions using the microphone
-   - Reading comprehension questions
-   - Questions generated from the lesson vocabulary and grammar
-   - Immediate feedback, corrections, XP, and retry flow
+#### 02. Learn grammar
 
-### Speaking practice
+- Beginner-friendly grammar explanations
+- Articles such as `der`, `die`, and `das`
+- Verb patterns such as `sein` and `heißen`
+- Formal and informal pronouns
+- W-questions
+- Negation with `nicht`
+- Possessives such as `mein` and `dein`
+- Spoken examples for every grammar pattern
 
-Speaking practice uses the browser Web Speech API:
+#### 03. Practise every skill
 
-- German recognition uses `de-DE`
-- English recognition uses `en-US`
-- The learner presses **Speak into mic**
-- The browser transcribes the phrase
-- Phrase text is normalized for accents, punctuation, and German `ß`
-- The transcript is compared with the target phrase
-- The learner sees what the system heard and receives feedback
+The Practice section is generated from the active lesson’s vocabulary and grammar:
 
-Microphone audio is processed in the browser and is not stored by the application. Chrome or Edge is recommended.
+| Skill | Experience |
+|---|---|
+| Writing | Type translations and target words |
+| Listening | Hear a phrase and identify its meaning |
+| Speaking | Use the microphone and receive transcript validation |
+| Reading | Read a phrase or grammar note and answer questions |
 
-## Curriculum
+Mixed Recall has intentionally been removed so the lesson stays focused on these four core skills.
 
-The current German course map includes twelve Netzwerk A1-inspired topic units:
+## Speaking validation
 
-1. Guten Tag! — Greetings and introductions
-2. Freunde, Kollegen und ich — People, hobbies, and jobs
-3. In der Stadt — Places and directions
-4. Guten Appetit! — Food and shopping
-5. Tag für Tag — Daily routines and time
-6. Zeit mit Freunden — Plans and free time
-7. Kontakte — Phones, messages, and appointments
-8. Meine Wohnung — Home and rooms
-9. Alles Arbeit? — Work and occupations
-10. Kleidung und Mode — Clothes, colors, and shopping
-11. Gesund und munter — Health and wellbeing
-12. Ab in den Urlaub! — Travel and holidays
+Speaking practice uses the browser’s Web Speech API:
 
-Chapter 1 currently has the deepest content, including the expanded glossary, essential phrases, grammar patterns, pronunciation, search, and complete four-skill practice generation.
+1. The learner selects a target phrase.
+2. The app plays a pronunciation model.
+3. The learner presses **Speak into mic**.
+4. The browser recognizes the spoken phrase.
+5. Phrase text is normalized for punctuation, accents, and German `ß`.
+6. The transcript is compared with the expected phrase.
+7. The learner sees what was heard and receives correct or retry feedback.
 
-## Technology
+German recognition uses `de-DE`; English recognition uses `en-US`. Microphone audio is processed in the browser and is not stored by PhraseFusion. Chrome or Edge is recommended.
+
+## Course content
+
+### German A1 learning path
+
+The current course map contains twelve beginner-focused units:
+
+1. **Guten Tag!** — Greetings and introductions
+2. **Freunde, Kollegen und ich** — People, hobbies, and jobs
+3. **In der Stadt** — Places and directions
+4. **Guten Appetit!** — Food and shopping
+5. **Tag für Tag** — Daily routines and time
+6. **Zeit mit Freunden** — Plans and free time
+7. **Kontakte** — Phones, messages, and appointments
+8. **Meine Wohnung** — Home and rooms
+9. **Alles Arbeit?** — Work and occupations
+10. **Kleidung und Mode** — Clothes, colors, and shopping
+11. **Gesund und munter** — Health and wellbeing
+12. **Ab in den Urlaub!** — Travel and holidays
+
+Chapter 1 currently has the most complete content coverage, including the expanded glossary, grammar patterns, pronunciation, search, and generated four-skill practice.
+
+## Interface highlights
+
+| Area | Included experience |
+|---|---|
+| Learn | Course path, unit progress, XP, streaks, and lesson launch |
+| Vocabulary | Search, emoji cues, translations, and pronunciation |
+| Grammar | Pattern cards, examples, and audio |
+| Practice | Writing, listening, speaking, and reading |
+| Review words | Mark known vocabulary and revisit due cards |
+| Settings | Switch between German and English courses |
+| Backend status | Live connection or Demo mode indicator |
+
+## Architecture
+
+```text
+┌──────────────────────┐
+│  React + Vite App    │
+│  Vercel deployment   │
+└──────────┬───────────┘
+           │ /api proxy
+           ▼
+┌──────────────────────┐
+│ Spring Boot REST API │
+│ Render Docker service│
+└──────────────────────┘
+```
 
 ### Frontend
 
-- React
+- React and React DOM
 - Vite
+- Responsive CSS animations
 - Browser Speech Synthesis API
-- Browser Web Speech Recognition API for microphone practice
-- Responsive CSS with animated UI components
-- Local storage for language selection, XP, and learning counters
+- Browser Web Speech Recognition API
+- Local storage for learner preferences and counters
 
 ### Backend
 
 - Java 21
 - Spring Boot 3.5
 - Spring Web
-- REST API
-- Docker-ready deployment
+- Docker
+- CORS configuration for the deployed frontend
 
-### Deployment
-
-- Frontend: Vercel
-- Backend: Render Docker Web Service
-- Frontend API proxy: `frontend/vercel.json`
-
-## Project structure
+## Repository structure
 
 ```text
 PhraseFusion/
 ├── frontend/
 │   ├── src/
-│   │   ├── main.jsx       # React app, curriculum, lesson logic, practice engine
-│   │   └── styles.css     # Dashboard, animations, lesson, and responsive styles
-│   ├── vercel.json        # Proxies /api requests to the backend
-│   ├── package.json
-│   └── index.html
+│   │   ├── main.jsx
+│   │   └── styles.css
+│   ├── vercel.json
+│   └── package.json
 ├── backend/
-│   ├── src/main/java/
-│   │   └── com/languageapp/
-│   │       ├── controller/
-│   │       └── LanguageLearningApplication.java
+│   ├── src/main/java/com/languageapp/
 │   ├── src/main/resources/application.properties
 │   ├── Dockerfile
 │   └── pom.xml
 ├── docker-compose.yml
+├── docs/
+│   └── MVP-SPEC.md
 └── README.md
 ```
 
-## Run locally
+## Production deployment
 
-### 1. Start the frontend
+PhraseFusion is already deployed as two connected services:
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### Frontend — Vercel
 
-Open the Vite URL shown in the terminal, usually:
+- Project root: `frontend`
+- Framework: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
 
-```text
-http://localhost:5173
-```
+### Backend — Render
 
-### 2. Start the backend
+- Service type: Docker Web Service
+- Dockerfile: `backend/Dockerfile`
+- Build context: repository root
+- Runtime port: Render’s `PORT` environment variable
 
-In another terminal:
+The frontend proxies `/api/*` requests through `frontend/vercel.json` to the Spring Boot service. When the API is unavailable, the interface remains usable with bundled course data and displays **Demo mode**.
 
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
-On Windows PowerShell:
-
-```powershell
-cd backend
-.\mvnw.cmd spring-boot:run
-```
-
-The API runs on:
-
-```text
-http://localhost:8080
-```
-
-### 3. Optional Docker setup
-
-```bash
-docker compose up -d
-```
-
-The backend reads these environment variables:
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `PORT` | `8080` | Server port |
-| `FRONTEND_URL` | `http://localhost:5173` | Allowed CORS origin |
-
-## API endpoints
+## Connected API
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| `GET` | `/api/health` | Check backend availability |
+| `GET` | `/api/health` | Verify backend availability |
 | `GET` | `/api/courses` | Load course metadata |
-| `POST` | `/api/progress` | Submit a correctness event |
+| `POST` | `/api/progress` | Submit practice correctness |
 
-Example progress request:
+The current progress endpoint validates incoming events. Full accounts, database persistence, and user-specific synchronization are part of the next product phase.
 
-```json
-{
-  "language": "german",
-  "correct": true
-}
-```
+## Product roadmap
 
-The current progress endpoint validates requests and returns `204 No Content`. Persistent user accounts and database-backed progress are planned next.
-
-## Deploy to Vercel and Render
-
-### Backend on Render
-
-Create a **Docker Web Service** connected to this repository:
-
-- **Root Directory:** leave empty
-- **Dockerfile Path:** `backend/Dockerfile`
-- **Branch:** `main`
-- **Environment variable:** `FRONTEND_URL=https://your-frontend-domain.vercel.app`
-
-Render provides a public backend URL such as:
-
-```text
-https://phrasefusion-backend.onrender.com
-```
-
-### Frontend on Vercel
-
-Create a Vercel project from the repository:
-
-- **Root Directory:** `frontend`
-- **Framework:** Vite
-- **Build command:** `npm run build`
-- **Output directory:** `dist`
-
-The included `frontend/vercel.json` proxies browser requests from `/api/*` to the Render backend. If the backend is unavailable, the application continues using bundled demo data and displays **Demo mode**.
-
-## Development commands
-
-```bash
-# Frontend development server
-cd frontend && npm run dev
-
-# Frontend production build
-cd frontend && npm run build
-
-# Frontend production preview
-cd frontend && npm run preview
-
-# Backend development server
-cd backend && ./mvnw spring-boot:run
-```
-
-## Roadmap
-
-- Complete all twelve German chapters with full vocabulary, grammar, and practice depth
-- Create an independent English curriculum instead of reusing the German chapter map
-- Persist users, progress, XP, streaks, and review scheduling in PostgreSQL
+- Complete all twelve German chapters with equal vocabulary and grammar depth
+- Build an independent English curriculum
 - Add authentication and learner profiles
-- Add spaced-repetition scheduling based on accuracy and recall interval
-- Improve pronunciation scoring with dedicated speech or pronunciation services
-- Add grammar-specific writing correction
+- Persist XP, streaks, review scheduling, and lesson progress
+- Add spaced repetition based on recall accuracy
+- Improve pronunciation scoring beyond transcript matching
+- Add richer grammar writing correction
 - Add real community posts and replies
-- Add achievements, weekly goals, and richer course analytics
-- Add teacher or admin tools for creating lessons
+- Add achievements, weekly goals, and learner analytics
+- Add lesson-authoring tools for teachers and administrators
 
-## Content and learning approach
+## Design principles
 
-PhraseFusion is built for active beginner learning. It uses textbook-aligned topics as a curriculum reference while presenting original teaching explanations and practice prompts. The goal is to help learners recognize, recall, pronounce, write, and use language in context—not simply complete a streak.
+- **Active recall over passive scrolling**
+- **Small explanations over overwhelming grammar pages**
+- **Useful phrases over isolated word lists**
+- **Encouraging feedback over punishment**
+- **Visual memory cues over plain text**
+- **Consistent practice over noisy competition**
 
-## License
+## Project status
 
-This project is currently maintained as a personal learning application. Add a project license before distributing or deploying it as an open-source product.
+PhraseFusion is an actively evolving learning product. The core interface, lesson workspace, vocabulary experience, grammar teaching flow, four-skill practice, pronunciation playback, and microphone speaking validation are implemented and deployed.
+
+<div align="center">
+
+### PhraseFusion
+#### Make every phrase your own.
+
+</div>
