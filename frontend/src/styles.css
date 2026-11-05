@@ -38,6 +38,7 @@ button { font: inherit; border: 0; cursor: pointer; }
 .main { flex: 1; min-width: 0; }
 .topbar { height: 77px; display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(24px, 5vw, 72px); border-bottom: 1px solid #ececf4; background: #fff; }
 .breadcrumb { display: flex; align-items: center; gap: 11px; color: #a2a1b0; font-size: 12px; }.breadcrumb b { color: #d3d1db; font-weight: 400; }.breadcrumb strong { color: #4a465a; }
+.api-status { margin-left: 5px; font-size: 10px; font-weight: 700; }.api-status.connected { color: #5da36b; }.api-status.offline { color: #c7865e; }.api-status.checking { color: #aaa8b6; }
 .top-actions { display: flex; align-items: center; gap: 14px; }.icon-button, .notification { color: #9e9cac; background: transparent; font-size: 18px; }.icon-button { font-weight: 700; font-size: 13px; }.notification { position: relative; }.notification i { position: absolute; top: -1px; right: -3px; width: 5px; height: 5px; border: 1px solid #fff; border-radius: 50%; background: #e58b73; }
 .content { max-width: 1130px; margin: 0 auto; padding: 43px 40px 65px; }
 .welcome-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; }.eyebrow { margin: 0 0 10px; }.welcome-row h1 { margin: 0; color: #2e2b43; font-size: clamp(29px, 3vw, 38px); letter-spacing: -.055em; font-weight: 600; }.welcome-row h1 span { color: #d4a467; font-size: 22px; vertical-align: 7px; }.subtitle { margin: 9px 0 0; color: #9898aa; font-size: 13px; }

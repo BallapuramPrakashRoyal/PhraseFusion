@@ -59,19 +59,22 @@ function App() {
   const [selected, setSelected] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [showLesson, setShowLesson] = useState(false);
+  const [apiStatus, setApiStatus] = useState('checking');
   const course = courseData[language];
   const isCorrect = selected === course.question.answer;
 
   const todayLabel = useMemo(() => new Intl.DateTimeFormat('en', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date()), []);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    if (!apiUrl) return;
-    fetch(`${apiUrl.replace(/\/$/, '')}/api/courses`)
+    const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+    fetch(`${apiUrl}/api/courses`)
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('Course API unavailable')))
-      .then((remoteCourses) => setCourseData((current) => ({ ...current, ...remoteCourses })))
+      .then((remoteCourses) => {
+        setCourseData((current) => ({ ...current, ...remoteCourses }));
+        setApiStatus('connected');
+      })
       .catch(() => {
-        // Keep the bundled starter lessons usable when the API is not configured.
+        setApiStatus('offline');
       });
   }, []);
 
@@ -85,14 +88,12 @@ function App() {
   function submitAnswer() {
     if (selected !== null) {
       setSubmitted(true);
-      const apiUrl = import.meta.env.VITE_API_URL;
-      if (apiUrl) {
-        fetch(`${apiUrl.replace(/\/$/, '')}/api/progress`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ language, correct: selected === course.question.answer }),
-        }).catch(() => {});
-      }
+      const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+      fetch(`${apiUrl}/api/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language, correct: selected === course.question.answer }),
+      }).catch(() => setApiStatus('offline'));
     }
   }
 
@@ -125,7 +126,7 @@ function App() {
 
       <main className="main">
         <header className="topbar">
-          <div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong></div>
+          <div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong><span className={`api-status ${apiStatus}`} title="Backend connection status">{apiStatus === 'connected' ? '● Live' : apiStatus === 'offline' ? '● Demo mode' : '○ Connecting'}</span></div>
           <div className="top-actions"><button className="icon-button">?</button><button className="icon-button">⌕</button><button className="notification">♢<i /></button></div>
         </header>
 

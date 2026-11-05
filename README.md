@@ -54,9 +54,8 @@ The frontend and Spring Boot API deploy separately:
    `backend/Dockerfile`. The API exposes `/api/health`, `/api/courses`, and
    `/api/progress`.
 2. Set `FRONTEND_URL` on the backend to the deployed Vercel URL.
-3. Set `VITE_API_URL` in the Vercel project to the deployed backend URL, then
-   redeploy the frontend.
+3. The frontend includes `frontend/vercel.json`, which proxies `/api/*` to
+   Render. Redeploy Vercel after pulling the latest commit.
 
-Without `VITE_API_URL`, the frontend intentionally uses bundled starter lessons
-so the demo remains viewable, but course loading and progress submission are
-not connected to the backend.
+The dashboard displays `Live` or `Demo mode` beside the course name so you can
+confirm whether the backend is connected.
