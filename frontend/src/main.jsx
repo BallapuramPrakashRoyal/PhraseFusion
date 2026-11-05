@@ -2,9 +2,25 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
+const germanChapters = [
+  { title: 'Guten Tag!', subtitle: 'Greetings & introductions', icon: '👋', teach: ['Hallo! — Hello!', 'Guten Morgen! — Good morning!', 'Wie heißen Sie? — What is your name?'], prompt: 'Choose the friendly German greeting:', choices: ['Guten Tag!', 'Gute Zahl!', 'Danke Haus!', 'Bis gestern!'], answer: 0, hint: 'Use Guten Tag! during the day.', translation: 'Guten Tag!' },
+  { title: 'Freunde, Kollegen und ich', subtitle: 'People, hobbies & jobs', icon: '🧑‍🤝‍🧑', teach: ['der Freund / die Freundin — friend', 'das Hobby — hobby', 'Was machst du gern? — What do you like doing?'], prompt: 'What does “das Hobby” mean?', choices: ['occupation', 'hobby', 'week', 'address'], answer: 1, hint: 'A Hobby is something you enjoy doing.', translation: 'hobby' },
+  { title: 'In der Stadt', subtitle: 'Places & directions', icon: '🗺️', teach: ['der Bahnhof — train station', 'links / rechts — left / right', 'geradeaus — straight ahead'], prompt: 'You want someone to continue straight. What do you say?', choices: ['geradeaus', 'Gute Nacht', 'bis bald', 'schön'], answer: 0, hint: 'geradeaus means straight ahead.', translation: 'geradeaus' },
+  { title: 'Guten Appetit!', subtitle: 'Food & shopping', icon: '🥨', teach: ['das Brot — bread', 'die Banane — banana', 'Ich möchte ... — I would like ...'], prompt: 'Complete: “Ich möchte ___, bitte.”', choices: ['ein Brötchen', 'links', 'Montag', 'krank'], answer: 0, hint: 'A Brötchen is a bread roll you can order.', translation: 'Ich möchte ein Brötchen, bitte.' },
+  { title: 'Tag für Tag', subtitle: 'Daily routines & time', icon: '⏰', teach: ['aufstehen — to get up', 'der Arbeitstag — workday', 'um acht Uhr — at eight o’clock'], prompt: 'What does “aufstehen” mean?', choices: ['to get up', 'to pay', 'to travel', 'to fit'], answer: 0, hint: 'It describes starting your day by getting up.', translation: 'to get up' },
+  { title: 'Zeit mit Freunden', subtitle: 'Plans & free time', icon: '🎉', teach: ['die Überraschung — surprise', 'bezahlen — to pay', 'Was machen wir? — What are we doing?'], prompt: 'Choose the phrase for “What are we doing?”', choices: ['Was machen wir?', 'Woher kommst du?', 'Wie heißen Sie?', 'Was kostet das?'], answer: 0, hint: 'machen means to do or make.', translation: 'Was machen wir?' },
+  { title: 'Kontakte', subtitle: 'Phone, messages & appointments', icon: '📱', teach: ['die Telefonnummer — phone number', 'die Nachricht — message', 'anrufen — to call'], prompt: 'Which word means “phone number”?', choices: ['die Telefonnummer', 'die Jahreszeit', 'der Bahnhof', 'das Wetter'], answer: 0, hint: 'Telefon + Nummer gives the meaning.', translation: 'die Telefonnummer' },
+  { title: 'Meine Wohnung', subtitle: 'Home & rooms', icon: '🏠', teach: ['die Wohnung — apartment', 'das Zimmer — room', 'der Tisch — table'], prompt: 'Where do you sleep?', choices: ['im Schlafzimmer', 'im Bahnhof', 'im Restaurant', 'im Flughafen'], answer: 0, hint: 'The bedroom is das Schlafzimmer.', translation: 'im Schlafzimmer' },
+  { title: 'Alles Arbeit?', subtitle: 'Work & occupations', icon: '💼', teach: ['der Beruf — occupation', 'arbeiten — to work', 'die Firma — company'], prompt: 'Complete: “Was sind Sie von ___?”', choices: ['Beruf', 'Hobby', 'Stadt', 'Uhr'], answer: 0, hint: 'This polite question asks about someone’s occupation.', translation: 'Was sind Sie von Beruf?' },
+  { title: 'Kleidung und Mode', subtitle: 'Clothes, colors & shopping', icon: '👕', teach: ['das Kleid — dress', 'passen — to fit', 'zweimal — twice'], prompt: 'What does “passen” mean in “Der Rock passt mir”?', choices: ['to fit', 'to cook', 'to hear', 'to learn'], answer: 0, hint: 'The sentence talks about whether clothing fits.', translation: 'to fit' },
+  { title: 'Gesund und munter', subtitle: 'Body & wellbeing', icon: '💚', teach: ['die Gesundheit — health', 'die Bauchschmerzen — stomach pain', 'schlafen — to sleep'], prompt: 'Choose the useful advice for someone who is tired:', choices: ['Du sollst schlafen.', 'Du sollst kaufen.', 'Du sollst tanzen.', 'Du sollst fahren.'], answer: 0, hint: 'schlafen means to sleep.', translation: 'You should sleep.' },
+  { title: 'Ab in den Urlaub!', subtitle: 'Travel & holidays', icon: '✈️', teach: ['die Städtereise — city trip', 'der Koffer — suitcase', 'aufschreiben — to write down'], prompt: 'What is “die Städtereise”?', choices: ['city trip', 'workday', 'bread roll', 'phone call'], answer: 0, hint: 'Stadt means city and Reise means trip.', translation: 'city trip' },
+];
+
 const courses = {
   german: {
     name: 'German', flag: '🇩🇪', accent: 'plum', greeting: 'Guten Morgen!', progress: 34,
+    chapters: germanChapters,
     lessons: [
       { title: 'Hallo, ich bin...', subtitle: 'Introductions & greetings', icon: '👋', done: true, minutes: '6 min' },
       { title: 'Zahlen & Alter', subtitle: 'Numbers and age', icon: '🔢', active: true, minutes: '8 min' },
@@ -27,6 +43,7 @@ const courses = {
   },
   english: {
     name: 'English', flag: '🇬🇧', accent: 'blue', greeting: 'Good morning!', progress: 62,
+    chapters: germanChapters,
     lessons: [
       { title: 'Hello, I am...', subtitle: 'Introductions & greetings', icon: '👋', done: true, minutes: '6 min' },
       { title: 'Numbers & age', subtitle: 'Numbers and age', icon: '🔢', active: true, minutes: '8 min' },
@@ -57,6 +74,7 @@ function App() {
   const [courseData, setCourseData] = useState(courses);
   const [showLesson, setShowLesson] = useState(false);
   const [exerciseIndex, setExerciseIndex] = useState(0);
+  const [activeExercises, setActiveExercises] = useState(null);
   const [selected, setSelected] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [apiStatus, setApiStatus] = useState('checking');
@@ -64,7 +82,8 @@ function App() {
   const [mastered, setMastered] = useState(Number(localStorage.getItem('phrasefusion-mastered') || 12));
   const [reviewed, setReviewed] = useState([]);
   const course = courseData[language];
-  const exercise = course.exercises[exerciseIndex];
+  const lessonExercises = activeExercises || course.exercises;
+  const exercise = lessonExercises[exerciseIndex];
   const isCorrect = selected === exercise.answer;
   const todayLabel = useMemo(() => new Intl.DateTimeFormat('en', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date()), []);
 
@@ -79,7 +98,7 @@ function App() {
     fetch(`${apiUrl}/api/courses`).then((response) => response.ok ? response.json() : Promise.reject())
       .then((remote) => {
         setCourseData((current) => Object.fromEntries(Object.entries(current).map(([key, value]) => [
-          key, remote[key] ? { ...value, ...remote[key], exercises: value.exercises, words: value.words } : value,
+          key, remote[key] ? { ...value, ...remote[key], chapters: value.chapters, exercises: value.exercises, words: value.words } : value,
         ])));
         setApiStatus('connected');
       })
@@ -90,8 +109,9 @@ function App() {
     setLanguage(next); setView('learn'); setShowLesson(false); setExerciseIndex(0); setSelected(null); setSubmitted(false);
   }
 
-  function openLesson() {
-    setExerciseIndex(0); setSelected(null); setSubmitted(false); setShowLesson(true);
+  function openLesson(exercises = null) {
+    const lesson = exercises || [{ ...course.chapters[1], type: 'choice' }];
+    setActiveExercises(lesson); setExerciseIndex(0); setSelected(null); setSubmitted(false); setShowLesson(true);
   }
 
   function submitAnswer() {
@@ -103,7 +123,7 @@ function App() {
   }
 
   function nextExercise() {
-    if (exerciseIndex === course.exercises.length - 1) { setShowLesson(false); return; }
+    if (exerciseIndex === lessonExercises.length - 1) { setShowLesson(false); setActiveExercises(null); return; }
     setExerciseIndex((value) => value + 1); setSelected(null); setSubmitted(false);
   }
 
@@ -132,23 +152,23 @@ function App() {
 
       <main className="main">
         <header className="topbar"><div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong><span className={`api-status ${apiStatus}`}>{apiStatus === 'connected' ? '● Live' : apiStatus === 'offline' ? '● Demo mode' : '○ Connecting'}</span></div><div className="top-actions"><button className="icon-button">?</button><button className="icon-button">⌕</button><button className="notification">♢<i /></button></div></header>
-        {view === 'learn' && <LearnView course={course} todayLabel={todayLabel} xp={xp} mastered={mastered} onStart={openLesson} />}
+        {view === 'learn' && <LearnView course={course} todayLabel={todayLabel} xp={xp} mastered={mastered} onStart={() => openLesson()} onChapter={(chapter) => openLesson([{ ...chapter, type: 'choice' }])} />}
         {view === 'practice' && <PracticeView course={course} onStart={openLesson} />}
         {view === 'review' && <ReviewView course={course} reviewed={reviewed} setReviewed={setReviewed} />}
         {view === 'community' && <CommunityView />}
         {view === 'settings' && <SettingsView language={language} chooseLanguage={chooseLanguage} apiStatus={apiStatus} />}
       </main>
 
-      {showLesson && <LessonModal course={course} exercise={exercise} exerciseIndex={exerciseIndex} selected={selected} submitted={submitted} isCorrect={isCorrect} setSelected={setSelected} submitAnswer={submitAnswer} nextExercise={nextExercise} close={() => setShowLesson(false)} />}
+      {showLesson && <LessonModal course={{ ...course, exercises: lessonExercises }} exercise={exercise} exerciseIndex={exerciseIndex} selected={selected} submitted={submitted} isCorrect={isCorrect} setSelected={setSelected} submitAnswer={submitAnswer} nextExercise={nextExercise} close={() => { setShowLesson(false); setActiveExercises(null); }} />}
     </div>
   );
 }
 
-function LearnView({ course, todayLabel, xp, mastered, onStart }) {
+function LearnView({ course, todayLabel, xp, mastered, onStart, onChapter }) {
   return <div className="content"><section className="welcome-row"><div><p className="eyebrow">{todayLabel.toUpperCase()} · READY WHEN YOU ARE</p><h1>{course.greeting} <span>✦</span></h1><p className="subtitle">A little practice today makes a confident speaker tomorrow.</p></div><div className="daily-goal"><div className="goal-ring"><b>3</b><span>/ 5</span></div><div><strong>Daily goal</strong><small>lessons completed</small></div><button>›</button></div></section>
     <section className="hero-panel"><div className="hero-copy"><div className="unit-kicker"><span className="unit-pill">UNIT 02</span><span>EVERYDAY CONVERSATIONS</span></div><h2>{course.name === 'German' ? <>Small words.<br /><em>Big confidence.</em></> : <>Find your voice.<br /><em>One phrase at a time.</em></>}</h2><p>Build a strong foundation with short, useful lessons inspired by your textbook path — then make every phrase your own.</p><button className="primary-button" onClick={onStart}>Continue lesson <span>→</span></button><div className="lesson-meta"><span>◷ 8 min</span><span>◉ +20 XP</span><span>◌ 4 exercises</span></div></div><div className="hero-art"><div className="sun" /><div className="cloud cloud-one" /><div className="cloud cloud-two" /><div className="hill hill-back" /><div className="hill hill-front" /><div className="speech-bubble bubble-one">Hallo!</div><div className="speech-bubble bubble-two">Let's go ✦</div><div className="character"><div className="character-hair" /><div className="character-face"><span className="eye left" /><span className="eye right" /><span className="smile" /></div><div className="character-body" /><div className="book">A</div></div></div></section>
     <section className="stats-strip"><div><strong>{xp}</strong><span>Total XP</span></div><div><strong>7</strong><span>Day streak</span></div><div><strong>{mastered}</strong><span>Words reviewed</span></div><div><strong>4.8</strong><span>Weekly accuracy</span></div></section>
-    <section className="section-heading"><div><p className="eyebrow">YOUR TEXTBOOK PATH</p><h2>Keep going, you’re doing great.</h2></div><button className="text-button">See all units <span>→</span></button></section><section className="lesson-grid">{course.lessons.map((lesson, index) => <article className={`lesson-card ${lesson.active ? 'current' : ''} ${lesson.locked ? 'locked' : ''}`} key={lesson.title}><div className="lesson-number">0{index + 1}</div><div className={`lesson-icon ${lesson.active ? 'active-icon' : ''}`}>{lesson.icon}</div><div className="lesson-info"><h3>{lesson.title}</h3><p>{lesson.subtitle}</p><small>◷ {lesson.minutes}</small></div>{lesson.done ? <div className="done-mark">✓</div> : lesson.locked ? <div className="lock">⌑</div> : <div className="play-mark">→</div>}</article>)}</section>
+    <section className="section-heading"><div><p className="eyebrow">NETZWERK A1 COURSE MAP</p><h2>Learn in the order that makes sense.</h2></div><span className="course-note">12 chapters · teach + practise</span></section><section className="lesson-grid chapter-grid">{course.chapters.map((chapter, index) => <button className={`lesson-card chapter-card ${index > 1 ? 'locked' : ''}`} onClick={() => onChapter(chapter)} key={chapter.title}><div className="lesson-number">0{index + 1}</div><div className={`lesson-icon ${index === 1 ? 'active-icon' : ''}`}>{chapter.icon}</div><div className="lesson-info"><h3>{chapter.title}</h3><p>{chapter.subtitle}</p><small>◷ 8 min · {chapter.teach.length} key phrases</small></div>{index === 0 ? <div className="done-mark">✓</div> : <div className="play-mark">→</div>}</button>)}</section>
     <section className="bottom-grid"><div className="tip-card"><div className="tip-icon">♧</div><div><p className="eyebrow">COACH'S NOTE</p><h3>Say it out loud.</h3><p>Your brain remembers phrases better when it hears your own voice. Try the next answer like you’re chatting with a friend.</p></div><span className="tip-spark">✦</span></div><div className="progress-card"><div className="progress-head"><div><p className="eyebrow">UNIT PROGRESS</p><h3>Getting comfortable</h3></div><strong>{course.progress}%</strong></div><div className="progress-bar"><span style={{ width: `${course.progress}%` }} /></div><div className="progress-foot"><span>✦ Keep building your base</span><span>Unit 2 of 6</span></div></div></section>
   </div>;
 }
@@ -170,7 +190,10 @@ function SettingsView({ language, chooseLanguage, apiStatus }) {
 }
 
 function LessonModal({ course, exercise, exerciseIndex, selected, submitted, isCorrect, setSelected, submitAnswer, nextExercise, close }) {
-  return <div className="modal-backdrop" onClick={close}><section className="lesson-modal" onClick={(event) => event.stopPropagation()}><button className="close-button" onClick={close}>×</button><div className="modal-progress"><span style={{ width: `${((exerciseIndex + (submitted ? 1 : 0)) / course.exercises.length) * 100}%` }} /></div><p className="eyebrow">UNIT 02 · EXERCISE {exerciseIndex + 1} OF {course.exercises.length}</p><div className="exercise-mascot">{exercise.type === 'translate' ? '🧩' : '🤔'}</div><h2>{exercise.prompt}</h2><p className="exercise-subtitle">Pick the best answer. No pressure — mistakes are how we learn.</p><div className="choices">{exercise.choices.map((choice, index) => <button key={choice} className={`choice ${selected === index ? 'chosen' : ''} ${submitted && index === exercise.answer ? 'correct' : ''} ${submitted && selected === index && !isCorrect ? 'incorrect' : ''}`} onClick={() => !submitted && setSelected(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}{submitted && index === exercise.answer && <span className="choice-status">✓</span>}</button>)}</div>{submitted && <div className={`feedback ${isCorrect ? 'feedback-good' : 'feedback-try'}`}><strong>{isCorrect ? 'Brilliant! That’s the one. ✨' : 'Good try — let’s make it stick.'}</strong><span>{isCorrect ? exercise.translation : exercise.hint}</span></div>}{!submitted ? <button className="primary-button modal-submit" disabled={selected === null} onClick={submitAnswer}>Check answer <span>→</span></button> : <button className="primary-button modal-submit" onClick={nextExercise}>{exerciseIndex === course.exercises.length - 1 ? 'Finish lesson' : 'Next exercise'} <span>→</span></button>}</section></div>;
+  const [phase, setPhase] = useState(exercise.teach ? 'teach' : 'practice');
+  return <div className="modal-backdrop" onClick={close}><section className="lesson-modal" onClick={(event) => event.stopPropagation()}><button className="close-button" onClick={close}>×</button><div className="modal-progress"><span style={{ width: phase === 'teach' ? '25%' : `${((exerciseIndex + (submitted ? 1 : 0)) / course.exercises.length) * 100}%` }} /></div>
+    {phase === 'teach' ? <><p className="eyebrow">UNIT 02 · LEARN THE PHRASES</p><div className="exercise-mascot">📚</div><h2>{exercise.title}</h2><p className="exercise-subtitle">First understand the building blocks. Then retrieve them from memory.</p><div className="teaching-list">{exercise.teach.map((phrase) => { const [german, english] = phrase.split(' — '); return <div className="teaching-card" key={phrase}><strong>{german}</strong><span>{english}</span><button aria-label={`Hear ${german}`} onClick={() => window.speechSynthesis?.speak(new SpeechSynthesisUtterance(german))}>🔊</button></div>; })}</div><div className="teach-tip">💡 Read each phrase aloud twice. Speaking and recalling together creates a stronger memory.</div><button className="primary-button modal-submit" onClick={() => setPhase('practice')}>Start practice <span>→</span></button></> : <><p className="eyebrow">UNIT 02 · EXERCISE {exerciseIndex + 1} OF {course.exercises.length}</p><div className="exercise-mascot">{exercise.type === 'translate' ? '🧩' : '🤔'}</div><h2>{exercise.prompt}</h2><p className="exercise-subtitle">Pick the best answer. No pressure — mistakes are how we learn.</p><div className="choices">{exercise.choices.map((choice, index) => <button key={choice} className={`choice ${selected === index ? 'chosen' : ''} ${submitted && index === exercise.answer ? 'correct' : ''} ${submitted && selected === index && !isCorrect ? 'incorrect' : ''}`} onClick={() => !submitted && setSelected(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}{submitted && index === exercise.answer && <span className="choice-status">✓</span>}</button>)}</div>{submitted && <div className={`feedback ${isCorrect ? 'feedback-good' : 'feedback-try'}`}><strong>{isCorrect ? 'Brilliant! That’s the one. ✨' : 'Good try — let’s make it stick.'}</strong><span>{isCorrect ? exercise.translation : exercise.hint}</span></div>}{!submitted ? <button className="primary-button modal-submit" disabled={selected === null} onClick={submitAnswer}>Check answer <span>→</span></button> : <button className="primary-button modal-submit" onClick={nextExercise}>{exerciseIndex === course.exercises.length - 1 ? 'Finish lesson' : 'Next exercise'} <span>→</span></button>}</>}
+  </section></div>;
 }
 
 createRoot(document.getElementById('root')).render(<App />);
