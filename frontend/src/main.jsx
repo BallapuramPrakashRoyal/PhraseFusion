@@ -128,6 +128,21 @@ function speakPhrase(text, language) {
   window.speechSynthesis.speak(utterance);
 }
 
+function normalizeSpeech(text) {
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
+}
+
+function speechMatches(spoken, target) {
+  const heard = normalizeSpeech(spoken);
+  const expected = normalizeSpeech(target);
+  if (!heard || !expected) return false;
+  if (heard === expected) return true;
+  const heardWords = heard.split(' ');
+  const expectedWords = expected.split(' ');
+  const matchingWords = expectedWords.filter((word, index) => heardWords[index] === word).length;
+  return matchingWords / expectedWords.length >= 0.8;
+}
+
 function App() {
   const [language, setLanguage] = useState(localStorage.getItem('phrasefusion-language') || 'german');
   const [view, setView] = useState('learn');
@@ -318,7 +333,11 @@ function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, s
   const [practiceAnswer, setPracticeAnswer] = useState('');
   const [practiceSubmitted, setPracticeSubmitted] = useState(false);
   const [practiceCorrect, setPracticeCorrect] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [heardText, setHeardText] = useState('');
+  const [micError, setMicError] = useState('');
   const [vocabularyQuery, setVocabularyQuery] = useState('');
+  const recognitionRef = React.useRef(null);
   const grammar = chapter.grammar || [{ title: 'Useful sentence pattern', rule: 'Notice the word order and repeat the example aloud.', examples: chapter.teach.slice(0, 2) }];
   const visibleVocabulary = chapter.teach.filter((phrase) => phrase.toLowerCase().includes(vocabularyQuery.toLowerCase()));
   const practiceSets = buildPracticeSets(chapter, course.name);
@@ -326,11 +345,15 @@ function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, s
   const practiceQuestion = practiceQuestions[practiceIndex];
 
   function choosePracticeMode(mode) {
+    recognitionRef.current?.stop();
     setPracticeMode(mode);
     setPracticeIndex(0);
     setPracticeAnswer('');
     setPracticeSubmitted(false);
     setPracticeCorrect(false);
+    setIsListening(false);
+    setHeardText('');
+    setMicError('');
   }
 
   function checkWriting() {
@@ -349,13 +372,51 @@ function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, s
     recordPracticeResult(correct);
   }
 
-  function completeSpeaking() {
-    setPracticeCorrect(true);
-    setPracticeSubmitted(true);
-    recordPracticeResult(true);
+  function startSpeakingPractice() {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+      setMicError('Microphone pronunciation checking is not supported in this browser. Try Chrome or Edge.');
+      return;
+    }
+    recognitionRef.current?.stop();
+    const recognition = new Recognition();
+    recognition.lang = course.name === 'German' ? 'de-DE' : 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      setIsListening(true);
+      setMicError('');
+      setHeardText('');
+    };
+    recognition.onresult = (event) => {
+      const alternatives = Array.from(event.results[0] || []).map((result) => result.transcript);
+      const heard = alternatives[0] || '';
+      const correct = alternatives.some((transcript) => speechMatches(transcript, practiceQuestion.phrase));
+      setHeardText(heard);
+      setPracticeCorrect(correct);
+      setPracticeSubmitted(true);
+      setIsListening(false);
+      recordPracticeResult(correct);
+    };
+    recognition.onerror = (event) => {
+      setIsListening(false);
+      setMicError(event.error === 'not-allowed' ? 'Microphone access was blocked. Allow microphone access and try again.' : 'I could not hear that clearly. Please try again.');
+    };
+    recognition.onend = () => setIsListening(false);
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setMicError('The microphone is busy. Please wait a moment and try again.');
+    }
   }
 
+  useEffect(() => () => recognitionRef.current?.stop(), []);
+
   function nextSkillQuestion() {
+    recognitionRef.current?.stop();
     if (practiceIndex === practiceQuestions.length - 1) {
       setPracticeIndex(0);
     } else {
@@ -364,6 +425,9 @@ function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, s
     setPracticeAnswer('');
     setPracticeSubmitted(false);
     setPracticeCorrect(false);
+    setIsListening(false);
+    setHeardText('');
+    setMicError('');
   }
 
   const renderSkillQuestion = () => {
@@ -374,7 +438,7 @@ function LessonWorkspace({ chapter, course, exercise, exerciseIndex, selected, s
       return <><h2>{practiceQuestion.prompt}</h2><button className="listen-prompt" onClick={() => speakPhrase(practiceQuestion.phrase, course.name)}>🔊 Play audio again</button><div className="choices">{practiceQuestion.choices.map((choice, index) => <button key={choice} className={`choice ${practiceAnswer === String(index) ? 'chosen' : ''} ${practiceSubmitted && index === practiceQuestion.answer ? 'correct' : ''} ${practiceSubmitted && practiceAnswer === String(index) && !practiceCorrect ? 'incorrect' : ''}`} onClick={() => checkPracticeChoice(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}</button>)}</div></>;
     }
     if (practiceMode === 'speaking') {
-      return <><h2>{practiceQuestion.prompt}</h2><div className="speak-target"><strong>{practiceQuestion.phrase}</strong><span>{practiceQuestion.meaning}</span></div><div className="speaking-actions"><button className="listen-prompt" onClick={() => speakPhrase(practiceQuestion.phrase, course.name)}>🔊 Hear model</button><button className="secondary-button" onClick={completeSpeaking} disabled={practiceSubmitted}>🎙 I said it clearly</button></div><p className="practice-note">There is no pressure to be perfect. Compare your pronunciation with the model and try again.</p></>;
+      return <><h2>{practiceQuestion.prompt}</h2><div className="speak-target"><strong>{practiceQuestion.phrase}</strong><span>{practiceQuestion.meaning}</span></div><div className="speaking-actions"><button className="listen-prompt" onClick={() => speakPhrase(practiceQuestion.phrase, course.name)}>🔊 Hear model</button><button className={`mic-button ${isListening ? 'recording' : ''}`} onClick={startSpeakingPractice} disabled={practiceSubmitted}>{isListening ? '🔴 Listening…' : '🎙 Speak into mic'}</button></div>{isListening && <div className="recording-indicator"><i /> Listening for your phrase…</div>}{heardText && <div className="heard-result">I heard: <strong>{heardText}</strong></div>}{micError && <div className="mic-error">{micError}</div>}<p className="practice-note">Allow microphone access, then say the complete phrase. Your speech is checked in the browser and is not stored.</p></>;
     }
     return <><h2>{practiceQuestion.prompt}</h2><div className="reading-passage">{practiceQuestion.passage.split('\\n').map((line) => <p key={line}>{line}</p>)}</div><div className="choices">{practiceQuestion.choices.map((choice, index) => <button key={choice} className={`choice ${practiceAnswer === String(index) ? 'chosen' : ''} ${practiceSubmitted && index === practiceQuestion.answer ? 'correct' : ''} ${practiceSubmitted && practiceAnswer === String(index) && !practiceCorrect ? 'incorrect' : ''}`} onClick={() => checkPracticeChoice(index)}><span className="choice-letter">{String.fromCharCode(65 + index)}</span>{choice}</button>)}</div></>;
   };
