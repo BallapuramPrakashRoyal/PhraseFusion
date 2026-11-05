@@ -1,6 +1,8 @@
-# PhraseFusion
-
 <div align="center">
+
+<img src="docs/assets/phrasefusion-logo.png" alt="PhraseFusion logo" width="320">
+
+<br>
 
 ### Learn languages through movement, memory, and real practice.
 
