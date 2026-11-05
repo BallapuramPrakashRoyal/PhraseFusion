@@ -1,6 +1,14 @@
-# AI Language Learning App
+# PhraseFusion
 
-Gamified language learning with AI-powered personalization.
+PhraseFusion is a playful, focused language-learning workspace built around short,
+textbook-aligned lessons. The first learning paths are English and German at A1 level.
+
+The current frontend includes:
+- A learner dashboard with daily goals, XP, streaks, and unit progress
+- English and German course switching
+- A four-lesson textbook path with locked and completed states
+- An interactive exercise modal with answer feedback and hints
+- Responsive layouts for desktop and mobile
 
 ## Stack
 - Frontend: React + Vite
@@ -9,7 +17,8 @@ Gamified language learning with AI-powered personalization.
 - Local orchestration: Docker Compose
 
 ## Initial target
-English → German, A1.
+English and German, A1. Lesson content is original practice material structured
+around beginner textbook topics; it does not reproduce publisher text.
 
 ## Run
 
