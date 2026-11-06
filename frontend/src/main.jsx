@@ -51,17 +51,116 @@ const germanChapters = [
     { title: 'Negation with nicht', rule: 'Put nicht before the part you want to make negative: Ich verstehe das nicht. — I do not understand that.', examples: ['Ich spreche nicht Deutsch. — I do not speak German.', 'Das ist nicht schlecht. — That is not bad.'] },
     { title: 'Possessives: mein and dein', rule: 'mein means my and dein means your (informal). They come before a noun: mein Name, dein Name.', examples: ['Mein Name ist Anna. — My name is Anna.', 'Wie ist dein Name? — What is your name?'] },
   ], prompt: 'Choose the friendly German greeting:', choices: ['Guten Tag!', 'Gute Zahl!', 'Danke Haus!', 'Bis gestern!'], answer: 0, hint: 'Use Guten Tag! during the day.', translation: 'Guten Tag!' },
-  { title: 'Freunde, Kollegen und ich', subtitle: 'People, hobbies & jobs', icon: '🧑‍🤝‍🧑', teach: ['der Freund / die Freundin — friend', 'das Hobby — hobby', 'Was machst du gern? — What do you like doing?'], prompt: 'What does “das Hobby” mean?', choices: ['occupation', 'hobby', 'week', 'address'], answer: 1, hint: 'A Hobby is something you enjoy doing.', translation: 'hobby' },
-  { title: 'In der Stadt', subtitle: 'Places & directions', icon: '🗺️', teach: ['der Bahnhof — train station', 'links / rechts — left / right', 'geradeaus — straight ahead'], prompt: 'You want someone to continue straight. What do you say?', choices: ['geradeaus', 'Gute Nacht', 'bis bald', 'schön'], answer: 0, hint: 'geradeaus means straight ahead.', translation: 'geradeaus' },
-  { title: 'Guten Appetit!', subtitle: 'Food & shopping', icon: '🥨', teach: ['das Brot — bread', 'die Banane — banana', 'Ich möchte ... — I would like ...'], prompt: 'Complete: “Ich möchte ___, bitte.”', choices: ['ein Brötchen', 'links', 'Montag', 'krank'], answer: 0, hint: 'A Brötchen is a bread roll you can order.', translation: 'Ich möchte ein Brötchen, bitte.' },
-  { title: 'Tag für Tag', subtitle: 'Daily routines & time', icon: '⏰', teach: ['aufstehen — to get up', 'der Arbeitstag — workday', 'um acht Uhr — at eight o’clock'], prompt: 'What does “aufstehen” mean?', choices: ['to get up', 'to pay', 'to travel', 'to fit'], answer: 0, hint: 'It describes starting your day by getting up.', translation: 'to get up' },
-  { title: 'Zeit mit Freunden', subtitle: 'Plans & free time', icon: '🎉', teach: ['die Überraschung — surprise', 'bezahlen — to pay', 'Was machen wir? — What are we doing?'], prompt: 'Choose the phrase for “What are we doing?”', choices: ['Was machen wir?', 'Woher kommst du?', 'Wie heißen Sie?', 'Was kostet das?'], answer: 0, hint: 'machen means to do or make.', translation: 'Was machen wir?' },
-  { title: 'Kontakte', subtitle: 'Phone, messages & appointments', icon: '📱', teach: ['die Telefonnummer — phone number', 'die Nachricht — message', 'anrufen — to call'], prompt: 'Which word means “phone number”?', choices: ['die Telefonnummer', 'die Jahreszeit', 'der Bahnhof', 'das Wetter'], answer: 0, hint: 'Telefon + Nummer gives the meaning.', translation: 'die Telefonnummer' },
-  { title: 'Meine Wohnung', subtitle: 'Home & rooms', icon: '🏠', teach: ['die Wohnung — apartment', 'das Zimmer — room', 'der Tisch — table'], prompt: 'Where do you sleep?', choices: ['im Schlafzimmer', 'im Bahnhof', 'im Restaurant', 'im Flughafen'], answer: 0, hint: 'The bedroom is das Schlafzimmer.', translation: 'im Schlafzimmer' },
-  { title: 'Alles Arbeit?', subtitle: 'Work & occupations', icon: '💼', teach: ['der Beruf — occupation', 'arbeiten — to work', 'die Firma — company'], prompt: 'Complete: “Was sind Sie von ___?”', choices: ['Beruf', 'Hobby', 'Stadt', 'Uhr'], answer: 0, hint: 'This polite question asks about someone’s occupation.', translation: 'Was sind Sie von Beruf?' },
-  { title: 'Kleidung und Mode', subtitle: 'Clothes, colors & shopping', icon: '👕', teach: ['das Kleid — dress', 'passen — to fit', 'zweimal — twice'], prompt: 'What does “passen” mean in “Der Rock passt mir”?', choices: ['to fit', 'to cook', 'to hear', 'to learn'], answer: 0, hint: 'The sentence talks about whether clothing fits.', translation: 'to fit' },
-  { title: 'Gesund und munter', subtitle: 'Body & wellbeing', icon: '💚', teach: ['die Gesundheit — health', 'die Bauchschmerzen — stomach pain', 'schlafen — to sleep'], prompt: 'Choose the useful advice for someone who is tired:', choices: ['Du sollst schlafen.', 'Du sollst kaufen.', 'Du sollst tanzen.', 'Du sollst fahren.'], answer: 0, hint: 'schlafen means to sleep.', translation: 'You should sleep.' },
-  { title: 'Ab in den Urlaub!', subtitle: 'Travel & holidays', icon: '✈️', teach: ['die Städtereise — city trip', 'der Koffer — suitcase', 'aufschreiben — to write down'], prompt: 'What is “die Städtereise”?', choices: ['city trip', 'workday', 'bread roll', 'phone call'], answer: 0, hint: 'Stadt means city and Reise means trip.', translation: 'city trip' },
+  { title: 'Freunde, Kollegen und ich', subtitle: 'People, hobbies & jobs', icon: '🧑‍🤝‍🧑', teach: [
+    'der Freund — male friend', 'die Freundin — female friend', 'der Kollege — colleague', 'die Kollegin — female colleague',
+    'das Hobby — hobby', 'der Beruf — occupation', 'arbeiten — to work', 'lernen — to learn',
+    'Musik hören — to listen to music', 'Sport machen — to do sport', 'Was machst du gern? — What do you like doing?',
+    'Ich spiele gern Fußball. — I like playing football.', 'Das macht Spaß. — That is fun.',
+  ], grammar: [
+    { title: 'The verb gern', rule: 'Put gern after the verb to say that you like doing something: Ich spiele gern.', examples: ['Ich höre gern Musik. — I like listening to music.', 'Was machst du gern? — What do you like doing?'] },
+    { title: 'Regular verbs: machen and spielen', rule: 'Regular verbs take endings such as ich mache, du machst, and er macht.', examples: ['Ich spiele Fußball. — I play football.', 'Du machst Sport. — You do sport.'] },
+    { title: 'Questions with was', rule: 'Was means what. Use it at the beginning of a question: Was machst du?', examples: ['Was machst du? — What are you doing?', 'Was ist dein Hobby? — What is your hobby?'] },
+  ], prompt: 'What does “das Hobby” mean?', choices: ['occupation', 'hobby', 'week', 'address'], answer: 1, hint: 'A Hobby is something you enjoy doing.', translation: 'hobby' },
+  { title: 'In der Stadt', subtitle: 'Places & directions', icon: '🗺️', teach: [
+    'der Bahnhof — train station', 'die Haltestelle — stop', 'die Straße — street', 'der Stadtplan — city map',
+    'das Zentrum — city centre', 'der Supermarkt — supermarket', 'die Apotheke — pharmacy', 'links — left',
+    'rechts — right', 'geradeaus — straight ahead', 'hier — here', 'dort — there',
+    'Wo ist der Bahnhof? — Where is the train station?', 'Wie komme ich zum Zentrum? — How do I get to the centre?',
+  ], grammar: [
+    { title: 'Imperatives for directions', rule: 'Use the short command form to give simple directions: Gehen Sie geradeaus! Fahren Sie links!', examples: ['Gehen Sie geradeaus! — Go straight ahead!', 'Gehen Sie nach rechts! — Go to the right!'] },
+    { title: 'zu + dative for destinations', rule: 'Use zu when saying where you are going: zum Bahnhof, zur Apotheke.', examples: ['Ich gehe zum Bahnhof. — I am going to the train station.', 'Wir gehen zur Apotheke. — We are going to the pharmacy.'] },
+    { title: 'Wo? and Wie komme ich?', rule: 'Wo asks where. Wie komme ich ...? asks how to reach a place.', examples: ['Wo ist das Zentrum? — Where is the city centre?', 'Wie komme ich zum Hotel? — How do I get to the hotel?'] },
+  ], prompt: 'You want someone to continue straight. What do you say?', choices: ['geradeaus', 'Gute Nacht', 'bis bald', 'schön'], answer: 0, hint: 'geradeaus means straight ahead.', translation: 'geradeaus' },
+  { title: 'Guten Appetit!', subtitle: 'Food & shopping', icon: '🥨', teach: [
+    'das Brot — bread', 'das Brötchen — bread roll', 'die Banane — banana', 'der Apfel — apple',
+    'der Käse — cheese', 'die Suppe — soup', 'das Wasser — water', 'der Kaffee — coffee',
+    'die Rechnung — bill', 'der Preis — price', 'kosten — to cost', 'kaufen — to buy',
+    'Ich möchte ... — I would like ...', 'Was kostet das? — How much does that cost?', 'Die Rechnung, bitte. — The bill, please.',
+  ], grammar: [
+    { title: 'Accusative: einen and ein', rule: 'After möchte, a masculine noun uses einen: Ich möchte einen Kaffee. Feminine and neuter nouns keep eine or ein.', examples: ['Ich möchte einen Kaffee. — I would like a coffee.', 'Ich möchte eine Suppe. — I would like a soup.'] },
+    { title: 'Polite requests with möchte', rule: 'möchte means would like. Use Ich möchte ... bitte when ordering politely.', examples: ['Ich möchte ein Brötchen, bitte. — I would like a bread roll, please.', 'Ich möchte Wasser. — I would like water.'] },
+    { title: 'Asking about prices', rule: 'Use Was kostet das? for one item and Was kosten die ...? for plural items.', examples: ['Was kostet das? — How much does that cost?', 'Was kosten die Äpfel? — How much do the apples cost?'] },
+  ], prompt: 'Complete: “Ich möchte ___, bitte.”', choices: ['ein Brötchen', 'links', 'Montag', 'krank'], answer: 0, hint: 'A Brötchen is a bread roll you can order.', translation: 'Ich möchte ein Brötchen, bitte.' },
+  { title: 'Tag für Tag', subtitle: 'Daily routines & time', icon: '⏰', teach: [
+    'aufstehen — to get up', 'frühstücken — to have breakfast', 'arbeiten — to work', 'lernen — to study',
+    'nach Hause gehen — to go home', 'schlafen — to sleep', 'der Morgen — morning', 'der Abend — evening',
+    'der Arbeitstag — workday', 'die Uhr — clock / time', 'um acht Uhr — at eight o’clock', 'heute — today',
+    'Wann stehst du auf? — When do you get up?', 'Ich stehe um sieben Uhr auf. — I get up at seven.',
+  ], grammar: [
+    { title: 'Separable verbs', rule: 'In a main sentence, the prefix moves to the end: aufstehen becomes Ich stehe auf.', examples: ['Ich stehe um sieben Uhr auf. — I get up at seven.', 'Wann stehst du auf? — When do you get up?'] },
+    { title: 'Time with um', rule: 'Use um before an exact time: um acht Uhr, um halb neun.', examples: ['Ich arbeite um acht Uhr. — I work at eight.', 'Der Kurs beginnt um neun Uhr. — The course begins at nine.'] },
+    { title: 'Time questions with wann', rule: 'Wann means when and comes first in a question.', examples: ['Wann beginnt der Kurs? — When does the course begin?', 'Wann gehst du nach Hause? — When do you go home?'] },
+  ], prompt: 'What does “aufstehen” mean?', choices: ['to get up', 'to pay', 'to travel', 'to fit'], answer: 0, hint: 'It describes starting your day by getting up.', translation: 'to get up' },
+  { title: 'Zeit mit Freunden', subtitle: 'Plans & free time', icon: '🎉', teach: [
+    'die Überraschung — surprise', 'der Film — film', 'das Konzert — concert', 'das Wochenende — weekend',
+    'die Party — party', 'treffen — to meet', 'bezahlen — to pay', 'tanzen — to dance',
+    'spazieren gehen — to go for a walk', 'Zeit haben — to have time', 'Was machen wir? — What are we doing?',
+    'Hast du Zeit? — Do you have time?', 'Das klingt gut! — That sounds good!', 'Bis später! — See you later!',
+  ], grammar: [
+    { title: 'Making suggestions with wollen', rule: 'Use wollen to say what you want to do: Wir wollen ins Kino gehen.', examples: ['Wir wollen einen Film sehen. — We want to watch a film.', 'Was wollen wir machen? — What do we want to do?'] },
+    { title: 'Invitations with hast du Zeit?', rule: 'Ask Hast du Zeit? before suggesting an activity. Answer with Ja, gern! or Leider nein.', examples: ['Hast du am Samstag Zeit? — Do you have time on Saturday?', 'Ja, gern! — Yes, gladly!'] },
+    { title: 'Time expressions', rule: 'Use am with days and im with months or seasons: am Samstag, im Sommer.', examples: ['Am Wochenende treffe ich Freunde. — I meet friends at the weekend.', 'Im Sommer tanzen wir draußen. — In summer we dance outside.'] },
+  ], prompt: 'Choose the phrase for “What are we doing?”', choices: ['Was machen wir?', 'Woher kommst du?', 'Wie heißen Sie?', 'Was kostet das?'], answer: 0, hint: 'machen means to do or make.', translation: 'Was machen wir?' },
+  { title: 'Kontakte', subtitle: 'Phone, messages & appointments', icon: '📱', teach: [
+    'die Telefonnummer — phone number', 'die Handynummer — mobile number', 'die Nachricht — message', 'die E-Mail — email',
+    'der Termin — appointment', 'anrufen — to call', 'schreiben — to write', 'schicken — to send',
+    'erreichen — to reach', 'besetzt — busy', 'später — later', 'heute Abend — this evening',
+    'Wie ist deine Nummer? — What is your number?', 'Ich rufe dich später an. — I will call you later.',
+  ], grammar: [
+    { title: 'Separable verb anrufen', rule: 'anrufen separates in a main sentence: Ich rufe dich an. The prefix an goes to the end.', examples: ['Ich rufe dich später an. — I will call you later.', 'Ruf mich bitte an! — Please call me!'] },
+    { title: 'Possessives: dein and Ihre', rule: 'Use dein for informal you and Ihre for formal you: deine Nummer, Ihre E-Mail-Adresse.', examples: ['Wie ist deine Telefonnummer? — What is your phone number?', 'Wie ist Ihre E-Mail-Adresse? — What is your email address?'] },
+    { title: 'Time words in messages', rule: 'Use heute, morgen, später, and jetzt to make messages precise.', examples: ['Ich schreibe dir später. — I will write to you later.', 'Ich kann jetzt nicht sprechen. — I cannot speak now.'] },
+  ], prompt: 'Which word means “phone number”?', choices: ['die Telefonnummer', 'die Jahreszeit', 'der Bahnhof', 'das Wetter'], answer: 0, hint: 'Telefon + Nummer gives the meaning.', translation: 'die Telefonnummer' },
+  { title: 'Meine Wohnung', subtitle: 'Home & rooms', icon: '🏠', teach: [
+    'die Wohnung — apartment', 'das Zimmer — room', 'das Wohnzimmer — living room', 'das Schlafzimmer — bedroom',
+    'die Küche — kitchen', 'das Bad — bathroom', 'der Tisch — table', 'der Stuhl — chair',
+    'das Bett — bed', 'die Tür — door', 'das Fenster — window', 'wohnen — to live',
+    'Wie ist deine Wohnung? — What is your apartment like?', 'Das Wohnzimmer ist hell. — The living room is bright.',
+  ], grammar: [
+    { title: 'There is: es gibt', rule: 'Use es gibt to say that something exists. The noun after it is in the accusative.', examples: ['Es gibt ein Wohnzimmer. — There is a living room.', 'Es gibt einen Balkon. — There is a balcony.'] },
+    { title: 'Location with in + dative', rule: 'Use in to describe where something is: im Wohnzimmer, in der Küche.', examples: ['Der Tisch steht im Wohnzimmer. — The table is in the living room.', 'Ich bin in der Küche. — I am in the kitchen.'] },
+    { title: 'Adjectives after sein', rule: 'After sein, an adjective describes the room: Das Zimmer ist klein, hell, or ruhig.', examples: ['Das Zimmer ist klein. — The room is small.', 'Die Wohnung ist sehr schön. — The apartment is very beautiful.'] },
+  ], prompt: 'Where do you sleep?', choices: ['im Schlafzimmer', 'im Bahnhof', 'im Restaurant', 'im Flughafen'], answer: 0, hint: 'The bedroom is das Schlafzimmer.', translation: 'im Schlafzimmer' },
+  { title: 'Alles Arbeit?', subtitle: 'Work & occupations', icon: '💼', teach: [
+    'der Beruf — occupation', 'die Arbeit — work', 'die Firma — company', 'das Büro — office',
+    'der Chef / die Chefin — boss', 'der Mitarbeiter — employee', 'der Lehrer — teacher', 'die Ärztin — doctor',
+    'der Ingenieur — engineer', 'arbeiten — to work', 'verdienen — to earn', 'beginnen — to begin',
+    'Was sind Sie von Beruf? — What is your occupation?', 'Ich arbeite als Lehrerin. — I work as a teacher.',
+  ], grammar: [
+    { title: 'Occupations with als', rule: 'Use als to say what job someone does: Ich arbeite als Lehrer.', examples: ['Ich arbeite als Ärztin. — I work as a doctor.', 'Er arbeitet als Ingenieur. — He works as an engineer.'] },
+    { title: 'Formal questions with Sie', rule: 'Use capitalized Sie with formal adults and match the verb ending: Was machen Sie?', examples: ['Was machen Sie beruflich? — What do you do professionally?', 'Wo arbeiten Sie? — Where do you work?'] },
+    { title: 'Word order in statements', rule: 'The conjugated verb is usually in position two: Ich arbeite in einer Firma.', examples: ['Ich arbeite in einem Büro. — I work in an office.', 'Meine Kollegin beginnt um neun. — My colleague starts at nine.'] },
+  ], prompt: 'Complete: “Was sind Sie von ___?”', choices: ['Beruf', 'Hobby', 'Stadt', 'Uhr'], answer: 0, hint: 'This polite question asks about someone’s occupation.', translation: 'Was sind Sie von Beruf?' },
+  { title: 'Kleidung und Mode', subtitle: 'Clothes, colors & shopping', icon: '👕', teach: [
+    'das Kleid — dress', 'der Rock — skirt', 'die Hose — trousers', 'das Hemd — shirt',
+    'die Jacke — jacket', 'der Schuh — shoe', 'die Größe — size', 'die Farbe — color',
+    'rot — red', 'blau — blue', 'schwarz — black', 'passen — to fit', 'tragen — to wear',
+    'Wie viel kostet das? — How much does that cost?', 'Das passt mir gut. — That fits me well.',
+  ], grammar: [
+    { title: 'Adjective colors', rule: 'Use color words after the noun or with sein: ein rotes Kleid, Die Jacke ist blau.', examples: ['Die Hose ist schwarz. — The trousers are black.', 'Ich möchte ein rotes Kleid. — I would like a red dress.'] },
+    { title: 'Dative with passen', rule: 'passen takes a dative person: Der Rock passt mir, aber er passt dir nicht.', examples: ['Die Jacke passt mir. — The jacket fits me.', 'Die Schuhe passen dir gut. — The shoes fit you well.'] },
+    { title: 'Shopping questions', rule: 'Ask Wie viel kostet ...? about price and Welche Größe? about size.', examples: ['Welche Größe haben Sie? — What size do you have?', 'Wie viel kostet die Jacke? — How much does the jacket cost?'] },
+  ], prompt: 'What does “passen” mean in “Der Rock passt mir”?', choices: ['to fit', 'to cook', 'to hear', 'to learn'], answer: 0, hint: 'The sentence talks about whether clothing fits.', translation: 'to fit' },
+  { title: 'Gesund und munter', subtitle: 'Body & wellbeing', icon: '💚', teach: [
+    'die Gesundheit — health', 'der Kopf — head', 'der Bauch — stomach', 'der Rücken — back',
+    'die Hand — hand', 'der Fuß — foot', 'die Bauchschmerzen — stomach pain', 'krank — ill',
+    'gesund — healthy', 'müde — tired', 'schlafen — to sleep', 'weh tun — to hurt',
+    'Was fehlt Ihnen? — What is wrong with you? (formal)', 'Ich habe Kopfschmerzen. — I have a headache.',
+  ], grammar: [
+    { title: 'haben with symptoms', rule: 'Use haben to describe many symptoms: Ich habe Kopfschmerzen, Fieber, or Bauchschmerzen.', examples: ['Ich habe Kopfschmerzen. — I have a headache.', 'Hast du Fieber? — Do you have a fever?'] },
+    { title: 'Modal verb sollen', rule: 'Use sollen to give advice: Du sollst schlafen. The second verb stays at the end.', examples: ['Du sollst viel trinken. — You should drink a lot.', 'Sie sollen zum Arzt gehen. — You should go to the doctor.'] },
+    { title: 'weh tun', rule: 'Use weh tun to say that a body part hurts: Der Kopf tut weh.', examples: ['Mein Rücken tut weh. — My back hurts.', 'Tut dein Fuß weh? — Does your foot hurt?'] },
+  ], prompt: 'Choose the useful advice for someone who is tired:', choices: ['Du sollst schlafen.', 'Du sollst kaufen.', 'Du sollst tanzen.', 'Du sollst fahren.'], answer: 0, hint: 'schlafen means to sleep.', translation: 'You should sleep.' },
+  { title: 'Ab in den Urlaub!', subtitle: 'Travel & holidays', icon: '✈️', teach: [
+    'die Städtereise — city trip', 'der Urlaub — holiday', 'der Koffer — suitcase', 'der Reisepass — passport',
+    'das Ticket — ticket', 'der Flughafen — airport', 'der Bahnhof — train station', 'das Hotel — hotel',
+    'die Reservierung — reservation', 'fahren — to travel / drive', 'fliegen — to fly', 'aufschreiben — to write down',
+    'Wann fährt der Zug? — When does the train leave?', 'Ich möchte ein Zimmer reservieren. — I would like to reserve a room.',
+  ], grammar: [
+    { title: 'Future plans with fahren and fliegen', rule: 'Use the present tense with a time expression for planned travel: Im Juli fliege ich nach Berlin.', examples: ['Im Sommer fliege ich nach Spanien. — In summer I fly to Spain.', 'Morgen fahre ich nach München. — Tomorrow I travel to Munich.'] },
+    { title: 'Prepositions for destinations', rule: 'Use nach with cities and countries without an article, and in die for countries with an article.', examples: ['Ich fahre nach Berlin. — I am travelling to Berlin.', 'Wir fliegen in die Schweiz. — We are flying to Switzerland.'] },
+    { title: 'Polite travel requests', rule: 'Use möchte and bitte when booking a room, asking for a ticket, or requesting information.', examples: ['Ich möchte ein Zimmer reservieren. — I would like to reserve a room.', 'Ein Ticket nach Hamburg, bitte. — A ticket to Hamburg, please.'] },
+  ], prompt: 'What is “die Städtereise”?', choices: ['city trip', 'workday', 'bread roll', 'phone call'], answer: 0, hint: 'Stadt means city and Reise means trip.', translation: 'city trip' },
 ];
 
 const courses = {
