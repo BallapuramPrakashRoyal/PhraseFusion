@@ -214,8 +214,28 @@ PhraseFusion is already deployed as two connected services:
 - Dockerfile: `backend/Dockerfile`
 - Build context: repository root
 - Runtime port: Render’s `PORT` environment variable
+- Attach a PostgreSQL database and configure `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`
 
 The frontend proxies `/api/*` requests through `frontend/vercel.json` to the Spring Boot service. When the API is unavailable, the interface remains usable with bundled course data and displays **Demo mode**.
+
+## Accounts and authentication
+
+PhraseFusion now supports persistent learner accounts:
+
+- Register with first name, last name, email, and a strong password
+- Log in again with the registered email and password
+- Passwords are stored only as BCrypt hashes
+- Sessions use expiring server-side tokens and can be ended from Settings
+- Account tables are created automatically from `backend/src/main/resources/schema.sql`
+
+Authentication endpoints:
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/auth/register` | Create an account and start a session |
+| `POST` | `/api/auth/login` | Sign in with email and password |
+| `GET` | `/api/auth/me` | Restore the current session |
+| `POST` | `/api/auth/logout` | Revoke the current session |
 
 ## Connected API
 
@@ -225,13 +245,12 @@ The frontend proxies `/api/*` requests through `frontend/vercel.json` to the Spr
 | `GET` | `/api/courses` | Load course metadata |
 | `POST` | `/api/progress` | Submit practice correctness |
 
-The current progress endpoint validates incoming events. Full accounts, database persistence, and user-specific synchronization are part of the next product phase.
+Practice events currently retain the existing API contract; account-backed progress synchronization remains the next persistence phase.
 
 ## Product roadmap
 
 - Complete all twelve German chapters with equal vocabulary and grammar depth
 - Build an independent English curriculum
-- Add authentication and learner profiles
 - Persist XP, streaks, review scheduling, and lesson progress
 - Add spaced repetition based on recall accuracy
 - Improve pronunciation scoring beyond transcript matching

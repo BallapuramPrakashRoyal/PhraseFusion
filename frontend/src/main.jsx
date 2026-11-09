@@ -291,7 +291,74 @@ function speechMatches(spoken, target) {
   return matchingWords / expectedWords.length >= 0.8;
 }
 
+function apiBase() {
+  return (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+}
+
+function AuthScreen({ onAuthenticated }) {
+  const [mode, setMode] = useState('login');
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  function update(event) {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  }
+
+  async function submit(event) {
+    event.preventDefault();
+    setError('');
+    if (mode === 'register' && form.password !== form.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch(`${apiBase()}/api/auth/${mode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(mode === 'register'
+          ? { firstName: form.firstName, lastName: form.lastName, email: form.email, password: form.password }
+          : { email: form.email, password: form.password }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || data.message || 'Unable to authenticate. Please try again.');
+      localStorage.setItem('phrasefusion-token', data.token);
+      onAuthenticated(data.user);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="auth-page">
+      <div className="auth-orbit auth-orbit-one" />
+      <div className="auth-orbit auth-orbit-two" />
+      <section className="auth-card">
+        <div className="auth-logo"><span className="brand-mark">P</span><strong>Phrase<span>Fusion</span></strong></div>
+        <div className="auth-cube" aria-hidden="true"><span>Hallo</span><b>hello</b><i>👋</i></div>
+        <p className="eyebrow">YOUR LANGUAGE ADVENTURE</p>
+        <h1>{mode === 'login' ? 'Welcome back!' : 'Start your streak.'}</h1>
+        <p className="auth-lead">{mode === 'login' ? 'Keep your words moving and continue where you left off.' : 'Build confident German and English habits, one playful lesson at a time.'}</p>
+        <form className="auth-form" onSubmit={submit}>
+          {mode === 'register' && <div className="auth-name-row"><label>First name<input name="firstName" required value={form.firstName} onChange={update} autoComplete="given-name" /></label><label>Last name<input name="lastName" required value={form.lastName} onChange={update} autoComplete="family-name" /></label></div>}
+          <label>Email address<input name="email" type="email" required value={form.email} onChange={update} autoComplete="email" /></label>
+          <label>Password<input name="password" type="password" required value={form.password} onChange={update} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength="8" /><small>{mode === 'register' && 'Use 8+ characters with uppercase, lowercase, a number, and a symbol.'}</small></label>
+          {mode === 'register' && <label>Confirm password<input name="confirmPassword" type="password" required value={form.confirmPassword} onChange={update} autoComplete="new-password" /></label>}
+          {error && <div className="auth-error" role="alert">{error}</div>}
+          <button className="auth-submit" disabled={busy}>{busy ? 'Opening your lesson...' : mode === 'login' ? 'Log in →' : 'Create my account →'}</button>
+        </form>
+        <p className="auth-switch">{mode === 'login' ? 'New to PhraseFusion?' : 'Already learning with us?'} <button onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}> {mode === 'login' ? 'Create an account' : 'Log in'}</button></p>
+      </section>
+    </div>
+  );
+}
+
 function App() {
+  const [authReady, setAuthReady] = useState(false);
+  const [user, setUser] = useState(null);
   const [language, setLanguage] = useState(localStorage.getItem('phrasefusion-language') || 'german');
   const [view, setView] = useState('learn');
   const [courseData, setCourseData] = useState(courses);
@@ -310,6 +377,19 @@ function App() {
   const exercise = lessonExercises[exerciseIndex];
   const isCorrect = selected === exercise.answer;
   const todayLabel = useMemo(() => new Intl.DateTimeFormat('en', { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date()), []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('phrasefusion-token');
+    if (!token) {
+      setAuthReady(true);
+      return;
+    }
+    fetch(`${apiBase()}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((profile) => setUser(profile))
+      .catch(() => localStorage.removeItem('phrasefusion-token'))
+      .finally(() => setAuthReady(true));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('phrasefusion-language', language);
@@ -346,13 +426,23 @@ function App() {
 
   function recordPracticeResult(correct) {
     if (correct) { setXp((value) => value + 20); setMastered((value) => value + 1); }
-    const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-    fetch(`${apiUrl}/api/progress`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language, correct }) }).catch(() => setApiStatus('offline'));
+    const token = localStorage.getItem('phrasefusion-token');
+    fetch(`${apiBase()}/api/progress`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ language, correct }) }).catch(() => setApiStatus('offline'));
   }
 
   function nextExercise() {
     if (exerciseIndex === lessonExercises.length - 1) { setShowLesson(false); setActiveExercises(null); return; }
     setExerciseIndex((value) => value + 1); setSelected(null); setSubmitted(false);
+  }
+
+  if (!authReady) return <div className="auth-loading">Loading your learning space...</div>;
+  if (!user) return <AuthScreen onAuthenticated={setUser} />;
+
+  function logout() {
+    const token = localStorage.getItem('phrasefusion-token');
+    fetch(`${apiBase()}/api/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
+    localStorage.removeItem('phrasefusion-token');
+    setUser(null);
   }
 
   return (
@@ -374,12 +464,12 @@ function App() {
       </aside>
 
       <main className="main">
-        <header className="topbar"><div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong><span className={`api-status ${apiStatus}`}>{apiStatus === 'connected' ? '● Live' : apiStatus === 'offline' ? '● Demo mode' : '○ Connecting'}</span></div><div className="top-actions"><button className="icon-button">?</button><button className="icon-button">⌕</button><button className="notification">♢<i /></button><div className="top-streak"><span className="top-fire">🔥</span><div><strong>7</strong><small>day streak</small></div></div><button className={`top-settings ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')} aria-label="Open settings">⚙<span>Settings</span></button><button className="top-profile" onClick={() => setView('settings')} aria-label="Open profile"><span className="top-avatar">PR</span><span><strong>Prakash</strong><small>{xp} XP · Explorer</small></span><b>⌄</b></button></div></header>
+        <header className="topbar"><div className="breadcrumb"><span>My learning</span><b>/</b><strong>{course.name}</strong><span className={`api-status ${apiStatus}`}>{apiStatus === 'connected' ? '● Live' : apiStatus === 'offline' ? '● Demo mode' : '○ Connecting'}</span></div><div className="top-actions"><button className="icon-button">?</button><button className="icon-button">⌕</button><button className="notification">♢<i /></button><div className="top-streak"><span className="top-fire">🔥</span><div><strong>7</strong><small>day streak</small></div></div><button className={`top-settings ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')} aria-label="Open settings">⚙<span>Settings</span></button><button className="top-profile" onClick={() => setView('settings')} aria-label="Open profile"><span className="top-avatar">{user.firstName.slice(0, 1)}{user.lastName.slice(0, 1)}</span><span><strong>{user.firstName}</strong><small>{xp} XP · Explorer</small></span><b>⌄</b></button></div></header>
         {view === 'learn' && <LearnView course={course} todayLabel={todayLabel} xp={xp} mastered={mastered} onStart={() => openLesson()} onChapter={(chapter) => openLesson([{ ...chapter, type: 'choice' }])} />}
         {view === 'practice' && <PracticeView course={course} onStart={openLesson} />}
         {view === 'review' && <ReviewView course={course} reviewed={reviewed} setReviewed={setReviewed} />}
         {view === 'community' && <CommunityView />}
-        {view === 'settings' && <SettingsView language={language} chooseLanguage={chooseLanguage} apiStatus={apiStatus} />}
+        {view === 'settings' && <SettingsView language={language} chooseLanguage={chooseLanguage} apiStatus={apiStatus} onLogout={logout} />}
       </main>
 
       {showLesson && <LessonWorkspace chapter={activeLesson} course={{ ...course, exercises: lessonExercises }} exercise={exercise} exerciseIndex={exerciseIndex} selected={selected} submitted={submitted} isCorrect={isCorrect} setSelected={setSelected} submitAnswer={submitAnswer} recordPracticeResult={recordPracticeResult} nextExercise={nextExercise} close={() => { setShowLesson(false); setActiveExercises(null); setActiveLesson(null); }} />}
@@ -408,8 +498,8 @@ function CommunityView() {
   return <div className="content inner-page"><p className="eyebrow">LEARN TOGETHER</p><h1>Small wins, shared.</h1><p className="page-lead">A calm community for encouragement, questions, and language practice — never pressure or noisy leaderboards.</p><div className="community-card"><div className="community-avatar">🌱</div><div><strong>Weekly prompt</strong><h2>What phrase made you smile this week?</h2><p>Share a phrase from your lesson and help another learner use it.</p><button className="primary-button">Write a response <span>→</span></button></div></div><div className="post-list"><article><span>🇩🇪</span><div><strong>Anna · German A1</strong><p>Today I finally remembered: <b>Ich bin 24 Jahre alt.</b> The age sentence clicked!</p><small>12 minutes ago · 4 encouraging replies</small></div></article><article><span>🇬🇧</span><div><strong>Sam · English A1</strong><p>My tip: say each new phrase while walking. It feels silly, but it works.</p><small>Yesterday · 8 encouraging replies</small></div></article></div></div>;
 }
 
-function SettingsView({ language, chooseLanguage, apiStatus }) {
-  return <div className="content inner-page"><p className="eyebrow">YOUR PREFERENCES</p><h1>Make PhraseFusion yours.</h1><p className="page-lead">Choose a comfortable pace. Effective learning is consistent, not exhausting.</p><div className="settings-list"><label><span>Learning language</span><select value={language} onChange={(event) => chooseLanguage(event.target.value)}><option value="german">German 🇩🇪</option><option value="english">English 🇬🇧</option></select></label><label><span>Daily goal</span><select defaultValue="5"><option value="5">5 minutes · Gentle</option><option value="10">10 minutes · Steady</option><option value="20">20 minutes · Focused</option></select></label><label><span>Backend connection</span><strong className={apiStatus}>{apiStatus === 'connected' ? 'Connected and syncing' : 'Using local demo data'}</strong></label><label><span>Learning approach</span><strong>Retrieval + spaced repetition</strong></label></div></div>;
+function SettingsView({ language, chooseLanguage, apiStatus, onLogout }) {
+  return <div className="content inner-page"><p className="eyebrow">YOUR PREFERENCES</p><h1>Make PhraseFusion yours.</h1><p className="page-lead">Choose a comfortable pace. Effective learning is consistent, not exhausting.</p><div className="settings-list"><label><span>Learning language</span><select value={language} onChange={(event) => chooseLanguage(event.target.value)}><option value="german">German 🇩🇪</option><option value="english">English 🇬🇧</option></select></label><label><span>Daily goal</span><select defaultValue="5"><option value="5">5 minutes · Gentle</option><option value="10">10 minutes · Steady</option><option value="20">20 minutes · Focused</option></select></label><label><span>Backend connection</span><strong className={apiStatus}>{apiStatus === 'connected' ? 'Connected and syncing' : 'Using local demo data'}</strong></label><label><span>Learning approach</span><strong>Retrieval + spaced repetition</strong></label><button className="logout-button" onClick={onLogout}>Log out of PhraseFusion</button></div></div>;
 }
 
 function buildPracticeSets(chapter, language) {
