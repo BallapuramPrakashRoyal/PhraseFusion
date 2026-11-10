@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowRight, Bell, BookOpen, BriefcaseBusiness, CalendarDays, ChartNoAxesColumnIncreasing, ChevronDown, Clock3, Flag, GalleryVertical, Gamepad2, HeartPulse, Home, Landmark, Layers, Map, MapPin, MessageCircle, Plane, ShoppingCart, Sparkles, Target, Trophy, Utensils, UserRound, Users } from 'lucide-react';
 import './styles.css';
 
 const chapterOneVocabulary = [
@@ -447,7 +446,7 @@ function App() {
   }
 
   return (
-    <div className={`app ${course.accent} ${view === 'learn' ? 'reference-mode' : ''}`}>
+    <div className={`app ${course.accent}`}>
       <aside className="sidebar">
         <div className="brand"><span className="brand-mark">P</span><span>Phrase<span>Fusion</span></span></div>
         <div className="sidebar-label">YOUR SPACE</div>
@@ -482,48 +481,26 @@ function App() {
 }
 
 function LearnView({ course, todayLabel, xp, mastered, onStart, onChapter }) {
-  return <ReferenceCourseMap course={course} onChapter={onChapter} />;
-}
-
-const referenceUnits = [
-  ["Hallo! Wie geht's?", "Greetings, introduction, personal information", Users],
-  ["Meine Welt", "Family, friends, relationships", Home],
-  ["In der Stadt", "Places, directions, transport", MapPin],
-  ["Essen und Trinken", "Food, drinks, ordering", Utensils],
-  ["Wohnen", "Housing, rooms, furniture", Home],
-  ["Einkaufen", "Shopping, clothes, prices", ShoppingCart],
-  ["Freizeit", "Hobbies, sports, free time", Gamepad2],
-  ["Im Alltag", "Daily routine, time expressions", CalendarDays],
-  ["Gesundheit", "Health, body, visiting a doctor", HeartPulse],
-  ["Reisen", "Travel, holidays, booking", Plane],
-  ["Arbeit und Beruf", "Jobs, workplace, professions", BriefcaseBusiness],
-  ["Deutschland und mehr", "Germany, culture, festivals, people", Landmark],
-];
-
-function GermanFlag() {
-  return <span className="pf-flag"><i /><i /><i /></span>;
-}
-
-function ReferenceCourseMap({ course, onChapter }) {
-  const [selected, setSelected] = useState(1);
-  const rows = [[0, 1, 2, 3], [7, 6, 5, 4], [8, 9, 10, 11]];
-  function choose(index) {
-    setSelected(index + 1);
-    if (index < 2 && course.chapters[index]) onChapter(course.chapters[index]);
-  }
-  return <div className="reference-map">
-    <aside className="reference-sidebar">
-      <div className="reference-brand"><GermanFlag /><div><strong>Phrase<span>Fusion</span></strong><small>Learn German • A1</small></div><ChevronDown size={19} /></div>
-      <nav>{[['Dashboard', Home], ['Course Map', Layers], ['Practice', Target], ['Flashcards', GalleryVertical], ['AI Tutor', Sparkles], ['Progress', ChartNoAxesColumnIncreasing], ['Resources', BookOpen]].map(([label, Icon]) => <button className={label === 'Course Map' ? 'active' : ''} key={label}><Icon size={25} /><span>{label}</span></button>)}</nav>
-      <div className="reference-sidebar-photo" />
-    </aside>
-    <main className="reference-main">
-      <header className="reference-hero"><div className="reference-hero-image" /><div className="reference-flag-wave"><i /><i /><i /></div><div className="reference-hero-content"><div className="reference-tag"><BookOpen size={18} /> A1 • Netzwerk</div><h1>German A1 <span>Course</span> <b>Map</b></h1><p>A structured learning journey based on Netzwerk A1 (Lessons 1–12)</p></div><div className="reference-actions"><button><Bell size={22} /></button><button>PR</button></div></header>
-      <section className="reference-overview"><div className="reference-book"><strong>Netzwerk<br /><b>A1</b></strong><small>Deutsch als Fremdsprache</small></div><div className="reference-course-name"><h2>Netzwerk A1</h2><p>Course Mapping</p></div><div className="reference-stat"><BookOpen /><div><strong>12</strong><span>Units</span></div></div><div className="reference-stat"><Target className="red" /><div><strong>~60</strong><span>Lessons</span></div></div><div className="reference-stat"><Clock3 /><div><strong>A1</strong><span>Level</span></div></div><div className="reference-progress"><div><strong>{course.progress}%</strong></div><span>Course Progress</span></div></section>
-      <div className="reference-section-heading">YOUR LEARNING JOURNEY</div>
-      <section className="reference-roadmap"><div className="reference-start"><ArrowRight size={24} /></div><div className="reference-rows">{rows.map((row, rowIndex) => <div className="reference-row" key={rowIndex}>{row.map((index) => { const [title, topic, Icon] = referenceUnits[index]; return <button className={`reference-unit ${selected === index + 1 ? 'selected' : ''}`} key={title} onClick={() => choose(index)}><div className="reference-unit-icon"><Icon size={37} /></div><div className="reference-unit-content"><span>Unit {index + 1}</span><h3>{title}</h3><p>{topic}</p></div><div className="reference-unit-status">{selected === index + 1 && <i />}</div></button>; })}</div>)}</div><div className="reference-finish"><Flag size={21} /></div></section>
-      <section className="reference-goals"><div className="reference-goal-heading"><Trophy size={37} /><div><h3>A1 Learning Goals</h3><p>By the end of this course, you will be able to:</p></div></div><div className="reference-goal-list">{[['Communicate in', 'everyday situations', MessageCircle], ['Talk about yourself,', 'family & daily life', UserRound], ['Handle common', 'real-life tasks', Map], ['Understand basic', 'German culture', GermanFlag]].map(([first, second, Icon], index) => <div className="reference-goal-pill" key={index}>{Icon === GermanFlag ? <GermanFlag /> : <Icon size={27} />}<span>{first}<br />{second}</span></div>)}</div></section>
-    </main>
+  const units = course.chapters.slice(0, 12);
+  const mapOrder = [0, 1, 2, 3, 7, 6, 5, 4, 8, 9, 10, 11];
+  const germanImages = [
+    'https://upload.wikimedia.org/wikipedia/commons/6/64/Brandenburger_Tor_abends.jpg',
+    'https://cdn.pixabay.com/photo/2014/10/23/18/05/neuschwanstein-500688_1280.jpg',
+    'https://images.unsplash.com/photo-1520637836862-4d197d17c42a?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1500534623283-312a1e7f2f47?auto=format&fit=crop&w=900&q=85',
+  ];
+  return <div className="content course-map-page"><section className="course-map-heading"><div><div className="course-chip">▱ &nbsp; A1 · Netzwerk</div><h1>{course.name} <em>Course Map</em></h1><p>A structured learning journey based on Netzwerk A1 (Lessons 1–12)</p></div></section>
+    <section className="course-summary"><div className="summary-book" style={{ backgroundImage: `url(${germanImages[0]})` }} /><div className="summary-title"><strong>Netzwerk A1</strong><span>Course Mapping</span></div><div className="summary-stat"><b className="stat-icon">▱</b><strong>{units.length}</strong><span>Units</span></div><div className="summary-stat"><b className="stat-icon">◎</b><strong>~60</strong><span>Lessons</span></div><div className="summary-stat"><b className="stat-icon">◷</b><strong>A1</strong><span>Level</span></div><div className="summary-progress"><strong>{course.progress}%</strong><span>Course Progress</span></div></section>
+    <section className="course-map-grid">{mapOrder.map((unitIndex, position) => { const chapter = units[unitIndex]; return <article className={`map-card ${unitIndex === 0 ? 'current' : unitIndex > 1 ? 'locked' : ''}`} key={chapter.title} style={{ '--map-image': `url(${germanImages[unitIndex]})`, '--map-position': position }}><button onClick={() => onChapter(chapter)} disabled={unitIndex > 1} className="map-card-button"><span className="map-card-icon">{unitIndex > 1 ? '×' : ''}</span><span className="map-card-copy"><small>Unit {unitIndex + 1}</small><strong>{chapter.title}</strong><span>{chapter.subtitle}</span></span><i>{unitIndex === 0 ? '●' : '○'}</i></button></article>; })}</section>
+    <section className="learning-goals"><div className="goal-heading"><span className="goal-image" style={{ backgroundImage: `url(${germanImages[1]})` }} /><div><strong>A1 Learning Goals</strong><small>By the end of this course, you will be able to:</small></div></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[2]})` }} /><span>Communicate in<br />everyday situations</span></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[3]})` }} /><span>Talk about yourself,<br />family & daily life</span></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[4]})` }} /><span>Handle common<br />real-life tasks</span></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[0]})` }} /><span>Understand basic<br />German culture</span></div></section>
   </div>;
 }
 
