@@ -482,10 +482,24 @@ function App() {
 
 function LearnView({ course, todayLabel, xp, mastered, onStart, onChapter }) {
   const units = course.chapters.slice(0, 12);
+  const germanImages = [
+    'https://upload.wikimedia.org/wikipedia/commons/6/64/Brandenburger_Tor_abends.jpg',
+    'https://cdn.pixabay.com/photo/2014/10/23/18/05/neuschwanstein-500688_1280.jpg',
+    'https://images.unsplash.com/photo-1520637836862-4d197d17c42a?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1500534623283-312a1e7f2f47?auto=format&fit=crop&w=900&q=85',
+  ];
   return <div className="content course-map-page"><section className="course-map-heading"><div><div className="course-chip">▱ &nbsp; A1 · Netzwerk</div><h1>{course.name} <em>Course Map</em></h1><p>A structured learning journey based on Netzwerk A1 (Lessons 1–12)</p></div></section>
-    <section className="course-summary"><div className="summary-book">📕</div><div className="summary-title"><strong>Netzwerk A1</strong><span>Course Mapping</span></div><div className="summary-stat"><b>▱</b><strong>{units.length}</strong><span>Units</span></div><div className="summary-stat"><b>◎</b><strong>~60</strong><span>Lessons</span></div><div className="summary-stat"><b>◷</b><strong>A1</strong><span>Level</span></div><div className="summary-progress"><strong>{course.progress}%</strong><span>Course Progress</span></div></section>
-    <section className="course-map-grid">{units.map((chapter, index) => <article className={`map-card ${index === 0 ? 'current' : index > 1 ? 'locked' : ''}`} key={chapter.title}><button onClick={() => onChapter(chapter)} disabled={index > 1} className="map-card-button"><span className="map-card-icon">{index > 1 ? '🔒' : chapter.icon}</span><span className="map-card-copy"><small>Unit {index + 1}</small><strong>{chapter.title}</strong><span>{chapter.subtitle}</span></span><i>{index === 0 ? '●' : '○'}</i></button></article>)}</section>
-    <section className="learning-goals"><div className="goal-heading"><span>✺</span><div><strong>A1 Learning Goals</strong><small>By the end of this course, you will be able to:</small></div></div><div className="goal-pill">💬 <span>Communicate in<br />everyday situations</span></div><div className="goal-pill">♙ <span>Talk about yourself,<br />family & daily life</span></div><div className="goal-pill">▱ <span>Handle common<br />real-life tasks</span></div><div className="goal-pill">🇩🇪 <span>Understand basic<br />German culture</span></div></section>
+    <section className="course-summary"><div className="summary-book" style={{ backgroundImage: `url(${germanImages[0]})` }} /><div className="summary-title"><strong>Netzwerk A1</strong><span>Course Mapping</span></div><div className="summary-stat"><b className="stat-icon">▱</b><strong>{units.length}</strong><span>Units</span></div><div className="summary-stat"><b className="stat-icon">◎</b><strong>~60</strong><span>Lessons</span></div><div className="summary-stat"><b className="stat-icon">◷</b><strong>A1</strong><span>Level</span></div><div className="summary-progress"><strong>{course.progress}%</strong><span>Course Progress</span></div></section>
+    <section className="course-map-grid">{units.map((chapter, index) => <article className={`map-card ${index === 0 ? 'current' : index > 1 ? 'locked' : ''}`} key={chapter.title} style={{ '--map-image': `url(${germanImages[index]})` }}><button onClick={() => onChapter(chapter)} disabled={index > 1} className="map-card-button"><span className="map-card-icon">{index > 1 ? '×' : ''}</span><span className="map-card-copy"><small>Unit {index + 1}</small><strong>{chapter.title}</strong><span>{chapter.subtitle}</span></span><i>{index === 0 ? '●' : '○'}</i></button></article>)}</section>
+    <section className="learning-goals"><div className="goal-heading"><span className="goal-image" style={{ backgroundImage: `url(${germanImages[1]})` }} /><div><strong>A1 Learning Goals</strong><small>By the end of this course, you will be able to:</small></div></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[2]})` }} /><span>Communicate in<br />everyday situations</span></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[3]})` }} /><span>Talk about yourself,<br />family & daily life</span></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[4]})` }} /><span>Handle common<br />real-life tasks</span></div><div className="goal-pill"><span className="goal-image small" style={{ backgroundImage: `url(${germanImages[0]})` }} /><span>Understand basic<br />German culture</span></div></section>
   </div>;
 }
 
